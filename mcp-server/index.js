@@ -1,19 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Albert MCP Server
- *
- * Gives Claude Code read/write access to Albert documents
- * via the Supabase API. Add to your Claude Code MCP config:
- *
- * {
- *   "mcpServers": {
- *     "albert": {
- *       "command": "node",
- *       "args": ["/Users/dereklomas/albert/mcp-server/index.js"]
- *     }
- *   }
- * }
+ * Albert MCP Server — token-efficient collaborative doc access
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -24,16 +12,45 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { createClient } from "@supabase/supabase-js";
 
+const ALBERT_URL = "https://albert-n0b635mw6-dereklomas-projects.vercel.app";
+
 const supabase = createClient(
   "https://ykhxaecbbxaaqlujuzde.supabase.co",
-  // Use anon key — RLS allows all access
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraHhhZWNiYnhhYXFsdWp1emRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjExMDEsImV4cCI6MjA4MDYzNzEwMX0.O2chfnHGQWLOaVSFQ-F6UJMlya9EzPbsUh848SEOPj4"
 );
 
 const server = new Server(
-  { name: "albert", version: "1.0.0" },
+  { name: "albert", version: "1.1.0" },
   { capabilities: { tools: {} } }
 );
+
+// --- HTML to plain text ---
+
+function stripHtml(html) {
+  if (!html) return "";
+  return html
+    .replace(/<h([1-3])[^>]*>(.*?)<\/h[1-3]>/gi, (_, level, text) => "#".repeat(+level) + " " + text + "\n")
+    .replace(/<li[^>]*>(.*?)<\/li>/gi, "- $1\n")
+    .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gi, "> $1\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<strong[^>]*>(.*?)<\/strong>/gi, "**$1**")
+    .replace(/<em[^>]*>(.*?)<\/em>/gi, "*$1*")
+    .replace(/<code[^>]*>(.*?)<\/code>/gi, "`$1`")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function wordCount(html) {
+  const text = stripHtml(html);
+  return text ? text.split(/\s+/).length : 0;
+}
 
 // --- Tool definitions ---
 
@@ -41,66 +58,55 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: "list_documents",
-      description:
-        "List all Albert documents. Returns id, title, chapter_number, word count, and last updated time.",
+      description: "List Albert documents. Returns id, title, chapter_number, word count. Does NOT return content — use read_document for that.",
       inputSchema: {
         type: "object",
-        properties: {},
+        properties: {
+          limit: { type: "number", description: "Max docs to return (default 50)" },
+        },
       },
     },
     {
       name: "read_document",
-      description:
-        "Read an Albert document's full content. Returns HTML content and metadata. Use list_documents first to find the id.",
+      description: "Read an Albert document. Returns plain text (markdown-like) by default. Pass format='html' for raw HTML.",
       inputSchema: {
         type: "object",
         properties: {
           id: { type: "string", description: "Document ID" },
+          format: { type: "string", enum: ["text", "html"], description: "Output format (default: text)" },
         },
         required: ["id"],
       },
     },
     {
       name: "update_document",
-      description:
-        "Update an Albert document's content and/or title. Content should be HTML. Other collaborators will see changes in real time.",
+      description: "Update an Albert document. Accepts plain text or HTML. Collaborators see changes in real time in the browser.",
       inputSchema: {
         type: "object",
         properties: {
           id: { type: "string", description: "Document ID" },
-          content: {
-            type: "string",
-            description: "New HTML content (optional)",
-          },
-          title: { type: "string", description: "New title (optional)" },
+          content: { type: "string", description: "New content (HTML)" },
+          title: { type: "string", description: "New title" },
         },
         required: ["id"],
       },
     },
     {
       name: "create_document",
-      description:
-        "Create a new Albert document. Returns the new document's id and URL.",
+      description: "Create a new Albert document.",
       inputSchema: {
         type: "object",
         properties: {
           title: { type: "string", description: "Document title" },
-          content: {
-            type: "string",
-            description: "Initial HTML content (optional)",
-          },
-          chapter_number: {
-            type: "number",
-            description: "Chapter number if this is a book chapter (optional)",
-          },
+          content: { type: "string", description: "Initial content (HTML)" },
+          chapter_number: { type: "number", description: "Chapter number (optional)" },
         },
         required: ["title"],
       },
     },
     {
       name: "search_documents",
-      description:
-        "Search Albert documents by title or content. Returns matching documents.",
+      description: "Search Albert documents by title or content.",
       inputSchema: {
         type: "object",
         properties: {
@@ -119,62 +125,40 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   switch (name) {
     case "list_documents": {
+      const limit = args?.limit || 50;
       const { data, error } = await supabase
         .from("albert_documents")
         .select("id, title, chapter_number, content, updated_at")
-        .order("chapter_number", { ascending: true, nullsFirst: false });
+        .order("chapter_number", { ascending: true, nullsFirst: false })
+        .limit(limit);
 
-      if (error) return errorResult(error.message);
+      if (error) return err(error.message);
 
-      const docs = (data || []).map((d) => ({
-        id: d.id,
-        title: d.title,
-        chapter_number: d.chapter_number,
-        words: d.content
-          ? d.content.replace(/<[^>]+>/g, "").trim().split(/\s+/).length
-          : 0,
-        updated_at: d.updated_at,
-      }));
+      // Compact format: one line per doc, no JSON bloat
+      const lines = (data || []).map((d) => {
+        const ch = d.chapter_number ? `ch${d.chapter_number} ` : "";
+        const wc = wordCount(d.content);
+        return `${d.id}\t${ch}${d.title || "Untitled"}\t${wc}w\t${d.updated_at.slice(0, 10)}`;
+      });
 
-      return textResult(JSON.stringify(docs, null, 2));
+      return ok(`id\ttitle\twords\tupdated\n${lines.join("\n")}`);
     }
 
     case "read_document": {
       const { data, error } = await supabase
         .from("albert_documents")
-        .select("*")
+        .select("id, title, chapter_number, content, updated_at")
         .eq("id", args.id)
         .single();
 
-      if (error) return errorResult(error.message);
+      if (error) return err(error.message);
 
-      // Strip HTML for a cleaner text representation alongside the raw HTML
-      const plainText = data.content
-        ? data.content
-            .replace(/<[^>]+>/g, "\n")
-            .replace(/&amp;/g, "&")
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\n{3,}/g, "\n\n")
-            .trim()
-        : "";
+      const format = args?.format || "text";
+      const content = format === "html" ? data.content : stripHtml(data.content);
 
-      return textResult(
-        JSON.stringify(
-          {
-            id: data.id,
-            title: data.title,
-            chapter_number: data.chapter_number,
-            updated_at: data.updated_at,
-            content_html: data.content,
-            content_text: plainText,
-            url: `https://albert-n0b635mw6-dereklomas-projects.vercel.app/d/${data.id}`,
-          },
-          null,
-          2
-        )
-      );
+      // Minimal header, then content
+      const header = `# ${data.title || "Untitled"}\nid: ${data.id} | ${ALBERT_URL}/d/${data.id}\n---\n`;
+      return ok(header + (content || "(empty)"));
     }
 
     case "update_document": {
@@ -187,87 +171,62 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         .update(updates)
         .eq("id", args.id);
 
-      if (error) return errorResult(error.message);
-
-      return textResult(
-        `Updated document ${args.id}. View at: https://albert-n0b635mw6-dereklomas-projects.vercel.app/d/${args.id}`
-      );
+      if (error) return err(error.message);
+      return ok(`Updated. ${ALBERT_URL}/d/${args.id}`);
     }
 
     case "create_document": {
       const id = randomId();
-      const doc = {
-        id,
-        title: args.title || "Untitled",
-        content: args.content || "",
-        chapter_number: args.chapter_number || null,
-      };
-
       const { error } = await supabase
         .from("albert_documents")
-        .insert(doc);
+        .insert({
+          id,
+          title: args.title || "Untitled",
+          content: args.content || "",
+          chapter_number: args.chapter_number || null,
+        });
 
-      if (error) return errorResult(error.message);
-
-      return textResult(
-        JSON.stringify(
-          {
-            id,
-            title: doc.title,
-            url: `https://albert-n0b635mw6-dereklomas-projects.vercel.app/d/${id}`,
-          },
-          null,
-          2
-        )
-      );
+      if (error) return err(error.message);
+      return ok(`Created ${id}. ${ALBERT_URL}/d/${id}`);
     }
 
     case "search_documents": {
       const { data, error } = await supabase
         .from("albert_documents")
-        .select("id, title, chapter_number, content, updated_at")
-        .or(
-          `title.ilike.%${args.query}%,content.ilike.%${args.query}%`
-        );
+        .select("id, title, chapter_number, content")
+        .or(`title.ilike.%${args.query}%,content.ilike.%${args.query}%`)
+        .limit(10);
 
-      if (error) return errorResult(error.message);
+      if (error) return err(error.message);
 
-      const results = (data || []).map((d) => ({
-        id: d.id,
-        title: d.title,
-        chapter_number: d.chapter_number,
-        preview: d.content
-          ? d.content.replace(/<[^>]+>/g, "").slice(0, 200)
-          : "",
-        url: `https://albert-n0b635mw6-dereklomas-projects.vercel.app/d/${d.id}`,
-      }));
+      const lines = (data || []).map((d) => {
+        const ch = d.chapter_number ? `ch${d.chapter_number} ` : "";
+        const preview = stripHtml(d.content).slice(0, 100).replace(/\n/g, " ");
+        return `${d.id}\t${ch}${d.title}\t${preview}`;
+      });
 
-      return textResult(JSON.stringify(results, null, 2));
+      return ok(lines.length ? lines.join("\n") : "No results.");
     }
 
     default:
-      return errorResult(`Unknown tool: ${name}`);
+      return err(`Unknown tool: ${name}`);
   }
 });
 
-function textResult(text) {
+function ok(text) {
   return { content: [{ type: "text", text }] };
 }
 
-function errorResult(message) {
+function err(message) {
   return { content: [{ type: "text", text: `Error: ${message}` }], isError: true };
 }
 
 function randomId() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let id = "";
-  for (let i = 0; i < 10; i++) {
-    id += chars[Math.floor(Math.random() * chars.length)];
-  }
+  for (let i = 0; i < 10; i++) id += chars[Math.floor(Math.random() * chars.length)];
   return id;
 }
-
-// --- Start ---
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
