@@ -7,7 +7,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import { useEffect, useRef, useCallback, useState } from "react";
 import { supabase, Document } from "@/lib/supabase";
-import { joinDocument, getIdentity, Peer } from "@/lib/presence";
+import { createChannel, subscribeChannel, getIdentity, Peer } from "@/lib/presence";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import Toolbar from "./Toolbar";
 import AIPanel from "./AIPanel";
@@ -145,9 +145,9 @@ export default function Editor({ document: doc }: { document: Document }) {
     showToast("Applied markdown changes");
   }
 
-  // Realtime channel
+  // Realtime channel — register all listeners BEFORE subscribing
   useEffect(() => {
-    const channel = joinDocument(doc.id);
+    const channel = createChannel(doc.id);
     channelRef.current = channel;
 
     channel.on("presence", { event: "sync" }, () => {
@@ -188,6 +188,9 @@ export default function Editor({ document: doc }: { document: Document }) {
       if (payload.sender === identity.id) return;
       setTitle(payload.title);
     });
+
+    // Subscribe AFTER all listeners are registered
+    subscribeChannel(channel);
 
     return () => {
       channel.unsubscribe();

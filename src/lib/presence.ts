@@ -73,15 +73,19 @@ export function getIdentity(): Peer {
   return identity;
 }
 
-export function joinDocument(documentId: string): RealtimeChannel {
+export function createChannel(documentId: string): RealtimeChannel {
   const identity = getIdentity();
 
-  const channel = supabase.channel(`doc:${documentId}`, {
+  return supabase.channel(`doc:${documentId}`, {
     config: {
       presence: { key: identity.id },
       broadcast: { self: false },
     },
   });
+}
+
+export function subscribeChannel(channel: RealtimeChannel) {
+  const identity = getIdentity();
 
   channel.subscribe(async (status) => {
     if (status === "SUBSCRIBED") {
@@ -92,6 +96,4 @@ export function joinDocument(documentId: string): RealtimeChannel {
       });
     }
   });
-
-  return channel;
 }
