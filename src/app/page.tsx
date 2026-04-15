@@ -1,65 +1,127 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase, Document } from "@/lib/supabase";
+import { nanoid } from "nanoid";
+import Link from "next/link";
 
 export default function Home() {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
+  async function loadDocuments() {
+    const { data, error } = await supabase
+      .from("albert_documents")
+      .select("*")
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading documents:", error);
+    } else {
+      setDocuments(data || []);
+    }
+    setLoading(false);
+  }
+
+  async function createDocument() {
+    const id = nanoid(10);
+    const { error } = await supabase.from("albert_documents").insert({
+      id,
+      title: "Untitled",
+      content: "",
+    });
+
+    if (error) {
+      console.error("Error creating document:", error);
+      return;
+    }
+
+    window.location.href = `/d/${id}`;
+  }
+
+  async function deleteDocument(id: string, e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Delete this document?")) return;
+
+    await supabase.from("albert_documents").delete().eq("id", id);
+    setDocuments((docs) => docs.filter((d) => d.id !== id));
+  }
+
+  function timeAgo(date: string) {
+    const seconds = Math.floor(
+      (Date.now() - new Date(date).getTime()) / 1000
+    );
+    if (seconds < 60) return "just now";
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Albert</h1>
+          <p className="text-zinc-500 mt-1">Collaborative markdown editor</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <button
+          onClick={createDocument}
+          className="bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+        >
+          New document
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-zinc-400 text-center py-20">Loading...</div>
+      ) : documents.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-zinc-400 mb-4">No documents yet</p>
+          <button
+            onClick={createDocument}
+            className="text-zinc-900 underline text-sm hover:text-zinc-600"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Create your first document
+          </button>
         </div>
-      </main>
+      ) : (
+        <div className="space-y-1">
+          {documents.map((doc) => (
+            <Link
+              key={doc.id}
+              href={`/d/${doc.id}`}
+              className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+            >
+              <div className="min-w-0">
+                <h2 className="font-medium truncate">
+                  {doc.title || "Untitled"}
+                </h2>
+                <p className="text-sm text-zinc-400 truncate mt-0.5">
+                  {doc.content
+                    ? doc.content.slice(0, 100).replace(/[#*_`]/g, "")
+                    : "Empty document"}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0 ml-4">
+                <span className="text-xs text-zinc-400">
+                  {timeAgo(doc.updated_at)}
+                </span>
+                <button
+                  onClick={(e) => deleteDocument(doc.id, e)}
+                  className="text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
