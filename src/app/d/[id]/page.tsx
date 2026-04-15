@@ -3,7 +3,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase, Document } from "@/lib/supabase";
-import Editor from "@/components/Editor";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/Editor"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-screen text-zinc-400">
+      Loading editor...
+    </div>
+  ),
+});
 
 export default function DocumentPage() {
   const params = useParams();
