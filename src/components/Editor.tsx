@@ -310,6 +310,35 @@ export default function Editor({ document: doc }: { document: Document }) {
                   : ""}
             </span>
 
+            {/* Save Version */}
+            <button
+              onClick={async () => {
+                if (!editor) return;
+                const msg = prompt("Version label (optional):");
+                if (msg === null) return;
+                await supabase.from("albert_versions").insert({
+                  document_id: doc.id,
+                  content: editor.getHTML(),
+                  title,
+                  message: msg || `Snapshot ${new Date().toLocaleDateString()}`,
+                });
+                showToast("Version saved");
+              }}
+              className="text-[11px] text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 px-2 py-0.5 rounded transition-colors"
+              title="Save a named version"
+            >
+              Save version
+            </button>
+
+            {/* History */}
+            <a
+              href={`/d/${doc.id}/history`}
+              className="text-[11px] text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 px-2 py-0.5 rounded transition-colors"
+              title="View version history & diffs"
+            >
+              History
+            </a>
+
             {/* Markdown toggle */}
             <button
               onClick={toggleMarkdown}

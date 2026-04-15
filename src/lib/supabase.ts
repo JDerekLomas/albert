@@ -25,4 +25,15 @@ export type Document = {
   content: string
   created_at: string
   updated_at: string
+  chapter_number: number | null
+  book_id: string | null
+}
+
+export type Version = {
+  id: string
+  document_id: string
+  content: string
+  title: string | null
+  created_at: string
+  message: string | null
 }
