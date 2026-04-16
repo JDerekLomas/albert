@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase, Version, Document } from "@/lib/supabase";
-import { diff_match_patch } from "diff-match-patch";
+import { diff_match_patch, Diff } from "diff-match-patch";
 import Link from "next/link";
 
 export default function HistoryPage() {
@@ -13,6 +13,7 @@ export default function HistoryPage() {
   const [versions, setVersions] = useState<Version[]>([]);
   const [selected, setSelected] = useState<[number, number]>([0, 1]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -27,7 +28,6 @@ export default function HistoryPage() {
 
       if (docRes.data) setDoc(docRes.data);
 
-      // Add current version at the top
       const current: Version = {
         id: "current",
         document_id: id,
@@ -45,6 +45,11 @@ export default function HistoryPage() {
     load();
   }, [id]);
 
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2000);
+  }
+
   function stripHtml(html: string): string {
     return html
       .replace(/<br\s*\/?>/gi, "\n")
@@ -58,35 +63,28 @@ export default function HistoryPage() {
       .trim();
   }
 
-  function renderDiff(oldIdx: number, newIdx: number): string {
-    if (versions.length < 2) return "";
+  function getDiffs(oldIdx: number, newIdx: number): Diff[] {
+    if (versions.length < 2) return [];
     const oldText = stripHtml(versions[oldIdx]?.content || "");
     const newText = stripHtml(versions[newIdx]?.content || "");
-
     const dmp = new diff_match_patch();
     const diffs = dmp.diff_main(oldText, newText);
     dmp.diff_cleanupSemantic(diffs);
+    return diffs;
+  }
 
-    return diffs
-      .map(([op, text]) => {
-        const escaped = text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/\n/g, "<br>");
-        if (op === 1)
-          return `<span class="bg-green-100 text-green-800">${escaped}</span>`;
-        if (op === -1)
-          return `<span class="bg-red-100 text-red-800 line-through">${escaped}</span>`;
-        return `<span>${escaped}</span>`;
-      })
-      .join("");
+  function handleDiffClick(op: number, text: string) {
+    navigator.clipboard.writeText(text);
+    if (op === -1) {
+      showToast("Deleted text copied — paste it in the editor");
+    } else if (op === 1) {
+      showToast("Added text copied");
+    }
   }
 
   async function restoreVersion(version: Version) {
     if (!confirm(`Restore to "${version.message || "this version"}"?`)) return;
 
-    // Save current as a version first
     if (doc) {
       await supabase.from("albert_versions").insert({
         document_id: id,
@@ -96,7 +94,6 @@ export default function HistoryPage() {
       });
     }
 
-    // Restore
     await supabase
       .from("albert_documents")
       .update({
@@ -125,6 +122,8 @@ export default function HistoryPage() {
     );
   }
 
+  const diffs = getDiffs(selected[1], selected[0]);
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -142,6 +141,10 @@ export default function HistoryPage() {
             &middot; {versions.length} versions
           </span>
         </div>
+        <div className="text-[11px] text-zinc-400">
+          Click <span className="bg-red-100 text-red-700 px-1 rounded">red</span> or{" "}
+          <span className="bg-green-100 text-green-700 px-1 rounded">green</span> text to copy
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
@@ -158,7 +161,10 @@ export default function HistoryPage() {
                   if (selected[0] === i) {
                     setSelected([i, selected[1]]);
                   } else {
-                    setSelected([Math.min(i, selected[0]), Math.max(i, selected[0])]);
+                    setSelected([
+                      Math.min(i, selected[0]),
+                      Math.max(i, selected[0]),
+                    ]);
                   }
                 }}
                 className={`w-full text-left px-3 py-2 rounded text-sm mb-0.5 transition-colors ${
@@ -209,16 +215,54 @@ export default function HistoryPage() {
                   {versions[selected[0]]?.message || "Newer"}
                 </span>
               </div>
-              <div
-                className="prose prose-sm max-w-none leading-relaxed font-serif"
-                dangerouslySetInnerHTML={{
-                  __html: renderDiff(selected[1], selected[0]),
-                }}
-              />
+              <div className="prose prose-sm max-w-none leading-relaxed font-serif">
+                {diffs.map(([op, text], i) => {
+                  if (op === 0) {
+                    return (
+                      <span
+                        key={i}
+                        dangerouslySetInnerHTML={{
+                          __html: text
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/\n/g, "<br>"),
+                        }}
+                      />
+                    );
+                  }
+                  return (
+                    <span
+                      key={i}
+                      onClick={() => handleDiffClick(op, text)}
+                      title={op === -1 ? "Click to copy deleted text" : "Click to copy added text"}
+                      className={`cursor-pointer transition-opacity hover:opacity-70 ${
+                        op === -1
+                          ? "bg-red-100 text-red-800 line-through"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                      dangerouslySetInnerHTML={{
+                        __html: text
+                          .replace(/&/g, "&amp;")
+                          .replace(/</g, "&lt;")
+                          .replace(/>/g, "&gt;")
+                          .replace(/\n/g, "<br>"),
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

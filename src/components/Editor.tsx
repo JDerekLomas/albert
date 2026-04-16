@@ -11,6 +11,7 @@ import { createChannel, subscribeChannel, getIdentity, Peer } from "@/lib/presen
 import { RealtimeChannel } from "@supabase/supabase-js";
 import Toolbar from "./Toolbar";
 import AIPanel from "./AIPanel";
+import CommentsPanel from "./CommentsPanel";
 
 export default function Editor({ document: doc }: { document: Document }) {
   const [title, setTitle] = useState(doc.title);
@@ -23,6 +24,7 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [markdownSource, setMarkdownSource] = useState("");
   const [wordCount, setWordCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
+  const [showComments, setShowComments] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
@@ -352,9 +354,28 @@ export default function Editor({ document: doc }: { document: Document }) {
               MD
             </button>
 
+            {/* Comments toggle */}
+            <button
+              onClick={() => {
+                setShowComments(!showComments);
+                if (!showComments) setShowAI(false);
+              }}
+              className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
+                showComments
+                  ? "bg-amber-500 text-white"
+                  : "text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+              }`}
+              title="Toggle comments panel"
+            >
+              Comments
+            </button>
+
             {/* AI toggle */}
             <button
-              onClick={() => setShowAI(!showAI)}
+              onClick={() => {
+                setShowAI(!showAI);
+                if (!showAI) setShowComments(false);
+              }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
                 showAI
                   ? "bg-violet-600 text-white"
@@ -431,6 +452,17 @@ export default function Editor({ document: doc }: { document: Document }) {
           </div>
         </footer>
       </div>
+
+      {/* Comments Panel */}
+      {showComments && (
+        <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
+          <CommentsPanel
+            documentId={doc.id}
+            selectedText={selectedText}
+            onClose={() => setShowComments(false)}
+          />
+        </div>
+      )}
 
       {/* AI Panel */}
       {showAI && (

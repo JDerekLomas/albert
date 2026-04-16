@@ -27,6 +27,19 @@ export type Document = {
   updated_at: string
   chapter_number: number | null
   book_id: string | null
+  status: string | null
+}
+
+export type Comment = {
+  id: string
+  document_id: string
+  content: string
+  author: string
+  from_pos: number
+  to_pos: number
+  quote: string | null
+  resolved: boolean
+  created_at: string
 }
 
 export type Version = {

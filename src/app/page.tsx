@@ -116,6 +116,19 @@ export default function Home() {
                       <span className="text-xs text-zinc-300 font-mono w-6 text-right shrink-0">
                         {doc.chapter_number}
                       </span>
+                      {/* Status dot */}
+                      <span
+                        title={doc.status || "draft"}
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          doc.status === "final"
+                            ? "bg-green-400"
+                            : doc.status === "in-review"
+                              ? "bg-blue-400"
+                              : doc.status === "needs-albert"
+                                ? "bg-amber-400"
+                                : "bg-zinc-200"
+                        }`}
+                      />
                       <div className="min-w-0 flex-1">
                         <h2 className="font-medium truncate text-sm">
                           {doc.title || "Untitled"}
