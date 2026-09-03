@@ -135,19 +135,87 @@ function suggestionSpan(type, text, sid, reason, author) {
   )}"${reasonAttr}>${escapeHtml(text)}</span>`;
 }
 
-/** Word-level diff between two paragraph plain-texts, rendered as suggestion-marked HTML. */
-function wordDiffHtml(oldText, newText, sid, reason, author) {
+function splitSentences(text) {
+  return (text.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) || [text]).map((s) => s.trim()).filter(Boolean);
+}
+
+/** Fraction of words two sentences share — cheap proxy for "same sentence, lightly edited" vs. "rewritten". */
+function wordOverlap(a, b) {
+  const setA = new Set(wordTokens(a).map((w) => w.trim().toLowerCase()).filter(Boolean));
+  const setB = new Set(wordTokens(b).map((w) => w.trim().toLowerCase()).filter(Boolean));
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let shared = 0;
+  for (const w of setA) if (setB.has(w)) shared++;
+  return shared / Math.max(setA.size, setB.size);
+}
+
+function fineWordDiffSpans(oldText, newText, sid, reason, author) {
   const runs = tokenDiff(wordTokens(oldText), wordTokens(newText));
   let html = "";
   for (const run of runs) {
     const text = run.items.join("");
     if (!text) continue;
     if (run.type === "equal") html += escapeHtml(text);
-    else if (run.type === "delete")
-      html += suggestionSpan("del", text, sid, reason, author);
+    else if (run.type === "delete") html += suggestionSpan("del", text, sid, reason, author);
     else html += suggestionSpan("ins", text, sid, reason, author);
   }
   return html;
+}
+
+/**
+ * Word-level diff between two paragraph plain-texts, rendered as
+ * suggestion-marked HTML — but tiered by sentence first, the same
+ * equal/delete/insert alignment already used one level up for paragraphs
+ * (reuses tokenDiff directly, with whole sentences as the tokens). A
+ * lightly-edited sentence (one word swapped) gets a clean word-level diff.
+ * A sentence rewritten from scratch shares almost no words with its old
+ * version, so a pure word-level diff on it produces unreadable confetti —
+ * dozens of tiny alternating del/ins pairs with no coherent shape — so a
+ * paired rewrite (delete-run and insert-run of equal length, sentence
+ * counts unchanged) gets one clean del + ins per sentence pair instead of
+ * word-level diffing when the two share fewer than half their words.
+ * Restructured spans (sentence count itself changes — one sentence split
+ * into two, etc.) can't be paired positionally at all; those collapse to
+ * one del + ins per unpaired run, so at least the untouched sentences
+ * around them stay untouched instead of getting swept into the same block.
+ */
+function wordDiffHtml(oldText, newText, sid, reason, author) {
+  const oldSentences = splitSentences(oldText);
+  const newSentences = splitSentences(newText);
+  const runs = tokenDiff(oldSentences, newSentences);
+
+  let html = "";
+  for (let i = 0; i < runs.length; i++) {
+    const run = runs[i];
+
+    if (run.type === "equal") {
+      html += run.items.map((s) => escapeHtml(s)).join(" ") + " ";
+      continue;
+    }
+
+    if (run.type === "delete") {
+      const next = runs[i + 1];
+      if (next && next.type === "insert" && next.items.length === run.items.length) {
+        for (let j = 0; j < run.items.length; j++) {
+          const a = run.items[j];
+          const b = next.items[j];
+          html +=
+            (wordOverlap(a, b) >= 0.5
+              ? fineWordDiffSpans(a, b, sid, reason, author)
+              : suggestionSpan("del", a, sid, reason, author) + suggestionSpan("ins", b, sid, reason, author)) + " ";
+        }
+        i++; // consume the paired insert run
+        continue;
+      }
+      html += suggestionSpan("del", run.items.join(" "), sid, reason, author) + " ";
+      continue;
+    }
+
+    if (run.type === "insert") {
+      html += suggestionSpan("ins", run.items.join(" "), sid, reason, author) + " ";
+    }
+  }
+  return html.trim();
 }
 
 // ---- split the current document's HTML into top-level blocks ----
