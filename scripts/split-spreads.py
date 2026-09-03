@@ -25,7 +25,7 @@ OUT = os.path.join(ROOT, "notebook-photos", "pages")
 # Everything here runs on a lighting-flattened copy of the frame (see flatten),
 # because raw brightness is not comparable across these photos: some spreads
 # have one page in sun and the facing page in deep shadow.
-PAPER_LEVEL = 0.80        # flattened value above which a pixel is paper
+PAPER_PERCENTILE = 82     # brightness percentile that marks paper vs table
 INK_LEVEL = 0.88          # flattened value below which a pixel is ink
 MIN_RUN_FRACTION = 0.45   # a paper row/col must be this covered across its span
 MARGIN = 0.012            # trim this fraction inward after finding the block
@@ -56,21 +56,34 @@ def ink_profile(flat):
     return (flat < INK_LEVEL).mean(axis=0)
 
 
+def _span(profile, lo_pct=1, hi_pct=99):
+    on = np.where(profile > MIN_RUN_FRACTION * profile.max())[0]
+    if on.size == 0:
+        return 0, len(profile)
+    # Trim the extreme ends so a bright highlight on the table or a sunlit
+    # finger doesn't drag the box outward.
+    return int(np.percentile(on, lo_pct)), int(np.percentile(on, hi_pct)) + 1
+
+
 def paper_bbox(gray):
-    """Bounding box of the page block, found on the lighting-flattened image."""
-    flat = flatten(gray)
-    mask = flat > PAPER_LEVEL   # paper sits near 1.0 after flattening
+    """Bounding box of the page block.
 
-    def span(profile):
-        on = np.where(profile > MIN_RUN_FRACTION * profile.max())[0]
-        if on.size == 0:
-            return 0, len(profile)
-        # Trim the extreme ends so a bright highlight on the table or a
-        # sunlit finger doesn't drag the box outward.
-        return int(np.percentile(on, 1)), int(np.percentile(on, 99)) + 1
+    Primary signal is raw brightness: paper is genuinely brighter than the
+    table. Note this canNOT be done on the flattened image — flattening
+    divides out local lighting, which makes the table look as 'bright' as the
+    paper and returns the whole frame.
 
-    y0, y1 = span(mask.mean(axis=1))
-    x0, x1 = span(mask.mean(axis=0))
+    Known limitation: on a spread with one page in full sun and the facing
+    page in deep shadow, the shadowed half falls below threshold and the box
+    collapses onto a single page — roughly 6 of 58 pages here. An ink-extent
+    fallback was tried for those and made things worse overall (15 bad), because
+    the wood grain of the table registers as ink. Left as-is deliberately: the
+    viewer shows whole spreads, so these splits are a convenience, not load-
+    bearing. Use --gutter to override a specific frame.
+    """
+    mask = gray > np.percentile(gray, PAPER_PERCENTILE) * 0.72
+    y0, y1 = _span(mask.mean(axis=1))
+    x0, x1 = _span(mask.mean(axis=0))
     return x0, y0, x1, y1
 
 
@@ -142,7 +155,7 @@ def process(path, outdir, do_enhance=True):
         # pulled outward by sunlit table beyond the outer edge, so each page
         # needs its own outer bound rather than the shared one.
         half = gray[top:bot, a:b]
-        col = (flatten(half) > PAPER_LEVEL).mean(axis=0)
+        col = (half > np.percentile(half, PAPER_PERCENTILE) * 0.72).mean(axis=0)
         bright = np.where(col > MIN_RUN_FRACTION * col.max())[0]
         if bright.size:
             if side == "L":
