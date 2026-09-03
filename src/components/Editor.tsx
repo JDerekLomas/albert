@@ -6,6 +6,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import { useEffect, useRef, useCallback, useState } from "react";
+import NextLink from "next/link";
 import { supabase, Document } from "@/lib/supabase";
 import { createChannel, subscribeChannel, getIdentity, Peer } from "@/lib/presence";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -266,15 +267,15 @@ export default function Editor({ document: doc }: { document: Document }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <ChapterSidebar currentDocId={doc.id} />
+      <ChapterSidebar bookId={doc.book_id} currentDocId={doc.id} />
 
       {/* Main editor area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
         <header className="border-b border-zinc-100 px-4 h-11 flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-2 min-w-0">
-            <a
-              href="/"
+            <NextLink
+              href={doc.book_id ? `/b/${doc.book_id}` : "/"}
               className="text-zinc-300 hover:text-zinc-500 transition-colors shrink-0"
             >
               <svg
@@ -288,7 +289,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-            </a>
+            </NextLink>
             <span className="text-zinc-200">/</span>
             <input
               type="text"

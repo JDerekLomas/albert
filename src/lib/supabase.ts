@@ -19,6 +19,12 @@ export const supabase = new Proxy({} as SupabaseClient, {
   },
 })
 
+export type Book = {
+  id: string
+  title: string
+  created_at: string
+}
+
 export type Document = {
   id: string
   title: string
@@ -26,6 +32,7 @@ export type Document = {
   created_at: string
   updated_at: string
   chapter_number: number | null
+  part_number: number | null
   book_id: string | null
   status: string | null
 }
