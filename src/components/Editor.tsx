@@ -12,6 +12,8 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import Toolbar from "./Toolbar";
 import AIPanel from "./AIPanel";
 import CommentsPanel from "./CommentsPanel";
+import SuggestionsPanel from "./SuggestionsPanel";
+import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
 
 export default function Editor({ document: doc }: { document: Document }) {
   const [title, setTitle] = useState(doc.title);
@@ -25,12 +27,15 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [wordCount, setWordCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionCount, setSuggestionCount] = useState(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
   const identity = getIdentity();
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Placeholder.configure({
@@ -38,6 +43,8 @@ export default function Editor({ document: doc }: { document: Document }) {
       }),
       Highlight,
       Typography,
+      SuggestionInsert,
+      SuggestionDelete,
     ],
     content: doc.content || "",
     editorProps: {
@@ -241,6 +248,19 @@ export default function Editor({ document: doc }: { document: Document }) {
     }
   }, [editor]);
 
+  // Pending suggestion count (drives the header badge)
+  useEffect(() => {
+    if (!editor) return;
+    const refresh = () => setSuggestionCount(collectSuggestions(editor).length);
+    refresh();
+    editor.on("update", refresh);
+    editor.on("transaction", refresh);
+    return () => {
+      editor.off("update", refresh);
+      editor.off("transaction", refresh);
+    };
+  }, [editor]);
+
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   return (
@@ -354,11 +374,44 @@ export default function Editor({ document: doc }: { document: Document }) {
               MD
             </button>
 
+            {/* Suggestions toggle */}
+            <button
+              onClick={() => {
+                setShowSuggestions(!showSuggestions);
+                if (!showSuggestions) {
+                  setShowAI(false);
+                  setShowComments(false);
+                }
+              }}
+              className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium flex items-center gap-1 ${
+                showSuggestions
+                  ? "bg-emerald-600 text-white"
+                  : suggestionCount > 0
+                    ? "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                    : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50"
+              }`}
+              title="Review pending AI suggestions"
+            >
+              Suggestions
+              {suggestionCount > 0 && (
+                <span
+                  className={`inline-flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full text-[9px] font-semibold ${
+                    showSuggestions ? "bg-white/20" : "bg-emerald-600 text-white"
+                  }`}
+                >
+                  {suggestionCount}
+                </span>
+              )}
+            </button>
+
             {/* Comments toggle */}
             <button
               onClick={() => {
                 setShowComments(!showComments);
-                if (!showComments) setShowAI(false);
+                if (!showComments) {
+                  setShowAI(false);
+                  setShowSuggestions(false);
+                }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
                 showComments
@@ -374,7 +427,10 @@ export default function Editor({ document: doc }: { document: Document }) {
             <button
               onClick={() => {
                 setShowAI(!showAI);
-                if (!showAI) setShowComments(false);
+                if (!showAI) {
+                  setShowComments(false);
+                  setShowSuggestions(false);
+                }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
                 showAI
@@ -452,6 +508,16 @@ export default function Editor({ document: doc }: { document: Document }) {
           </div>
         </footer>
       </div>
+
+      {/* Suggestions Panel */}
+      {showSuggestions && (
+        <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
+          <SuggestionsPanel
+            editor={editor}
+            onClose={() => setShowSuggestions(false)}
+          />
+        </div>
+      )}
 
       {/* Comments Panel */}
       {showComments && (
