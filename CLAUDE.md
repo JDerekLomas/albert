@@ -126,3 +126,21 @@ fresh) — don't just trust the deploy command's "Ready" status.
 ## Environment
 - `.env.local` has Supabase URL, anon key, and service role key
 - Never commit secrets
+
+## If you're a different AI session working in this repo
+Welcome — this section is for you specifically (Albert's Claude Code, a collaborator's session,
+whoever's not Derek's own). The repo is public, so you can clone and read freely. To also
+read/write chapters and post comments, you only need **`NEXT_PUBLIC_SUPABASE_URL` +
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`** in a `.env.local` — that's the same access level the web app
+itself runs on (`src/lib/supabase.ts` never uses anything else client-side), and the RLS
+policies on every `albert_*` table are permissive enough for full read/write with just that key.
+
+**Do not use `SUPABASE_SERVICE_ROLE_KEY`, and do not ask Derek for it.** This Supabase project
+is shared with `sourcelibrary`, an unrelated production app with real users — the service role
+key bypasses RLS entirely and is a master key over *that entire database*, not just this book.
+If you're not Derek's own session working directly in this repo with `.env.local` already
+present, you don't need it and shouldn't have it.
+
+**Edits go through `scripts/suggest-chapter.mjs`, never a direct `content` write** — see
+"Working with the Manuscript" above. This isn't optional: Derek/Albert's whole review workflow
+depends on AI edits arriving as reviewable suggestion marks, not applied prose.
