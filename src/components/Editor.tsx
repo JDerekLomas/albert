@@ -13,6 +13,7 @@ import Toolbar from "./Toolbar";
 import AIPanel from "./AIPanel";
 import CommentsPanel from "./CommentsPanel";
 import SuggestionsPanel from "./SuggestionsPanel";
+import ChapterSidebar from "./ChapterSidebar";
 import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
 
 export default function Editor({ document: doc }: { document: Document }) {
@@ -265,6 +266,8 @@ export default function Editor({ document: doc }: { document: Document }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <ChapterSidebar currentDocId={doc.id} />
+
       {/* Main editor area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
