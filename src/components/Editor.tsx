@@ -16,7 +16,9 @@ import AIPanel from "./AIPanel";
 import CommentsPanel from "./CommentsPanel";
 import SuggestionsPanel from "./SuggestionsPanel";
 import ChapterSidebar from "./ChapterSidebar";
+import ChapterIndexPanel from "./ChapterIndexPanel";
 import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
+import { CommentHighlight } from "@/lib/comment-mark";
 
 export default function Editor({ document: doc }: { document: Document }) {
   const [title, setTitle] = useState(doc.title);
@@ -25,11 +27,13 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showAI, setShowAI] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [selectionRange, setSelectionRange] = useState<{ from: number; to: number }>({ from: 0, to: 0 });
   const [showMarkdown, setShowMarkdown] = useState(false);
   const [markdownSource, setMarkdownSource] = useState("");
   const [wordCount, setWordCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const [showIndex, setShowIndex] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionCount, setSuggestionCount] = useState(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -48,11 +52,17 @@ export default function Editor({ document: doc }: { document: Document }) {
       Typography,
       SuggestionInsert,
       SuggestionDelete,
+      CommentHighlight,
     ],
     content: doc.content || "",
     editorProps: {
       attributes: {
         class: "tiptap focus:outline-none",
+      },
+      handleClick: (_view, _pos, event) => {
+        const target = (event.target as HTMLElement)?.closest("[data-comment-id]");
+        if (target) setShowComments(true);
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -75,6 +85,7 @@ export default function Editor({ document: doc }: { document: Document }) {
       const { from, to } = editor.state.selection;
       if (from !== to) {
         setSelectedText(editor.state.doc.textBetween(from, to));
+        setSelectionRange({ from, to });
       } else {
         setSelectedText("");
       }
@@ -405,6 +416,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                 if (!showSuggestions) {
                   setShowAI(false);
                   setShowComments(false);
+                  setShowIndex(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium flex items-center gap-1 ${
@@ -435,6 +447,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                 if (!showComments) {
                   setShowAI(false);
                   setShowSuggestions(false);
+                  setShowIndex(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
@@ -447,6 +460,26 @@ export default function Editor({ document: doc }: { document: Document }) {
               Comments
             </button>
 
+            {/* Index toggle */}
+            <button
+              onClick={() => {
+                setShowIndex(!showIndex);
+                if (!showIndex) {
+                  setShowAI(false);
+                  setShowSuggestions(false);
+                  setShowComments(false);
+                }
+              }}
+              className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
+                showIndex
+                  ? "bg-sky-600 text-white"
+                  : "text-sky-600 hover:text-sky-700 hover:bg-sky-50"
+              }`}
+              title="Chapter outline, themes, and editorial notes"
+            >
+              Index
+            </button>
+
             {/* AI toggle */}
             <button
               onClick={() => {
@@ -454,6 +487,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                 if (!showAI) {
                   setShowComments(false);
                   setShowSuggestions(false);
+                  setShowIndex(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
@@ -538,6 +572,7 @@ export default function Editor({ document: doc }: { document: Document }) {
         <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
           <SuggestionsPanel
             editor={editor}
+            documentId={doc.id}
             onClose={() => setShowSuggestions(false)}
           />
         </div>
@@ -548,8 +583,21 @@ export default function Editor({ document: doc }: { document: Document }) {
         <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
           <CommentsPanel
             documentId={doc.id}
+            editor={editor}
             selectedText={selectedText}
+            selectionRange={selectionRange}
             onClose={() => setShowComments(false)}
+          />
+        </div>
+      )}
+
+      {/* Chapter Index Panel */}
+      {showIndex && (
+        <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
+          <ChapterIndexPanel
+            documentId={doc.id}
+            documentUpdatedAt={doc.updated_at}
+            onClose={() => setShowIndex(false)}
           />
         </div>
       )}

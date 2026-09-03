@@ -45,6 +45,12 @@ const SUMMARY_SCHEMA = {
       type: "string",
       description: "2-4 sentences: what actually happens in this chapter, in reading order.",
     },
+    outline: {
+      type: "array",
+      items: { type: "string" },
+      description:
+        "5-12 short beats in reading order, one per scene/movement of the chapter (e.g. 'Arrives in Acre and meets the film crew', 'Flashback: the call from the producer'). This is a structural map of the chapter, not a paraphrase of every paragraph.",
+    },
     themes: {
       type: "array",
       items: { type: "string" },
@@ -59,7 +65,7 @@ const SUMMARY_SCHEMA = {
       description: "Anything that explicitly echoes an earlier chapter or plants something for a later one.",
     },
   },
-  required: ["synopsis", "themes", "people", "places", "motifs", "callbacks"],
+  required: ["synopsis", "outline", "themes", "people", "places", "motifs", "callbacks"],
 };
 
 async function callGemini(system, userText, schema) {
@@ -96,16 +102,20 @@ async function summarizeOne(doc) {
 
   const text = doc.content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-  const { synopsis, themes, people, places, motifs, callbacks } = await callGemini(
+  const { synopsis, outline, themes, people, places, motifs, callbacks } = await callGemini(
     "You are a developmental editor building a reference index for a memoir. Read the chapter and extract a factual, specific summary — no praise, no critique, just what's there.",
     `${doc.title}\n\n${text}`,
     SUMMARY_SCHEMA
   );
 
+  // editor_notes is intentionally left out of this payload — it's a
+  // freeform human/AI scratch pad, not a regenerated field, and Supabase
+  // upsert only touches the columns present in the payload.
   const { error } = await supabase.from("albert_chapter_summaries").upsert(
     {
       document_id: doc.id,
       synopsis,
+      outline,
       themes,
       entities: { people, places, motifs, callbacks },
       source_updated_at: doc.updated_at,

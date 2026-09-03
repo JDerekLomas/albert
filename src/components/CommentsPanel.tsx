@@ -1,16 +1,27 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Editor } from "@tiptap/react";
 import { supabase, Comment } from "@/lib/supabase";
 import { getIdentity } from "@/lib/presence";
+import {
+  applyCommentMark,
+  removeCommentMark,
+  setCommentMarkResolved,
+  scrollToCommentMark,
+} from "@/lib/comment-mark";
 
 export default function CommentsPanel({
   documentId,
+  editor,
   selectedText,
+  selectionRange,
   onClose,
 }: {
   documentId: string;
+  editor: Editor | null;
   selectedText: string;
+  selectionRange: { from: number; to: number };
   onClose: () => void;
 }) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -36,35 +47,47 @@ export default function CommentsPanel({
   async function addComment() {
     if (!newComment.trim()) return;
 
-    const { error } = await supabase.from("albert_comments").insert({
-      document_id: documentId,
-      content: newComment.trim(),
-      author: identity.name,
-      from_pos: 0,
-      to_pos: 0,
-      quote: selectedText || null,
-      resolved: false,
-    });
+    const hasAnchor = selectedText && selectionRange.from !== selectionRange.to;
 
-    if (!error) {
+    const { data, error } = await supabase
+      .from("albert_comments")
+      .insert({
+        document_id: documentId,
+        content: newComment.trim(),
+        author: identity.name,
+        from_pos: hasAnchor ? selectionRange.from : 0,
+        to_pos: hasAnchor ? selectionRange.to : 0,
+        quote: selectedText || null,
+        resolved: false,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
       setPostError(null);
       setNewComment("");
+      if (editor && hasAnchor) {
+        applyCommentMark(editor, selectionRange.from, selectionRange.to, data.id);
+      }
       loadComments();
     } else {
-      setPostError(error.message);
+      setPostError(error?.message ?? "Failed to post comment");
     }
   }
 
   async function toggleResolved(comment: Comment) {
+    const resolved = !comment.resolved;
     await supabase
       .from("albert_comments")
-      .update({ resolved: !comment.resolved })
+      .update({ resolved })
       .eq("id", comment.id);
+    if (editor) setCommentMarkResolved(editor, comment.id, resolved);
     loadComments();
   }
 
   async function deleteComment(id: string) {
     await supabase.from("albert_comments").delete().eq("id", id);
+    if (editor) removeCommentMark(editor, id);
     loadComments();
   }
 
@@ -172,7 +195,12 @@ export default function CommentsPanel({
                 }`}
               >
                 {c.quote && (
-                  <div className="text-[11px] text-zinc-400 italic mb-1.5 border-l-2 border-zinc-200 pl-2 line-clamp-2">
+                  <div
+                    onClick={() => editor && c.to_pos > c.from_pos && scrollToCommentMark(editor, c.id)}
+                    className={`text-[11px] text-zinc-400 italic mb-1.5 border-l-2 border-zinc-200 pl-2 line-clamp-2 ${
+                      editor && c.to_pos > c.from_pos ? "cursor-pointer hover:text-zinc-600 hover:border-amber-300" : ""
+                    }`}
+                  >
                     {c.quote.slice(0, 150)}
                     {c.quote.length > 150 ? "..." : ""}
                   </div>

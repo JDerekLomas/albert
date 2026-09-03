@@ -130,6 +130,37 @@ body {
   opacity: 0.75;
 }
 
+/* Comment anchors — text a comment applies to, distinct from suggestion marks */
+.tiptap .comment-highlight {
+  background: #fef9c3;
+  border-bottom: 2px solid #facc15;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.tiptap .comment-highlight:hover {
+  background: #fef08a;
+}
+
+.tiptap .comment-highlight[data-resolved="true"] {
+  background: transparent;
+  border-bottom: 2px solid #d4d4d8;
+}
+
+.tiptap .comment-highlight[data-resolved="true"]:hover {
+  background: #f4f4f5;
+}
+
+.tiptap .comment-highlight-flash {
+  animation: comment-flash 1.2s ease;
+}
+
+@keyframes comment-flash {
+  0%, 100% { background: #fef9c3; }
+  30% { background: #fde047; }
+}
+
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;

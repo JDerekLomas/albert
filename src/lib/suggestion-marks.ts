@@ -1,4 +1,5 @@
 import { Mark, mergeAttributes } from "@tiptap/core";
+import { supabase } from "./supabase";
 
 /**
  * Suggestion marks — the review layer. An AI (or human) proposes an edit as
@@ -131,14 +132,42 @@ export function collectSuggestions(editor: {
 }
 
 /**
+ * Once a suggestion is resolved, the losing text is gone from the live
+ * document for good — reading it back means diffing version snapshots.
+ * Logging every resolution here instead gives the Suggestions panel a
+ * "Resolved" history (what was proposed, what was kept, what was deleted)
+ * without keeping dead prose in `content`, where it would otherwise get
+ * counted into word counts and fed to the chapter-summary model.
+ */
+async function logResolution(
+  documentId: string,
+  suggestion: Suggestion,
+  accept: boolean
+) {
+  const del = suggestion.parts.find((p) => p.type === "del")?.text ?? null;
+  const ins = suggestion.parts.find((p) => p.type === "ins")?.text ?? null;
+  const { error } = await supabase.from("albert_suggestion_log").insert({
+    document_id: documentId,
+    sid: suggestion.sid,
+    action: accept ? "accepted" : "rejected",
+    del_text: del,
+    ins_text: ins,
+    reason: suggestion.reason,
+    author: suggestion.author,
+  });
+  if (error) console.error("Failed to log suggestion resolution:", error.message);
+}
+
+/**
  * Resolve one suggestion: `accept` keeps the insertion and drops the
  * deletion; rejecting does the opposite. Ranges are applied highest-position
  * first so earlier offsets in the same transaction stay valid.
  */
-export function resolveSuggestion(
+export async function resolveSuggestion(
   editor: import("@tiptap/react").Editor,
   suggestion: Suggestion,
-  accept: boolean
+  accept: boolean,
+  documentId: string
 ) {
   const ranges = [...suggestion.parts].sort((a, b) => b.from - a.from);
   const tr = editor.state.tr;
@@ -158,17 +187,30 @@ export function resolveSuggestion(
   }
 
   editor.view.dispatch(tr);
+  await logResolution(documentId, suggestion, accept);
 }
 
-export function resolveAll(
+export async function resolveAll(
   editor: import("@tiptap/react").Editor,
-  accept: boolean
+  accept: boolean,
+  documentId: string
 ) {
   let suggestions = collectSuggestions(editor);
   // Resolve from the bottom of the doc up so positions stay valid across suggestions.
   while (suggestions.length) {
     const last = suggestions[suggestions.length - 1];
-    resolveSuggestion(editor, last, accept);
+    await resolveSuggestion(editor, last, accept, documentId);
     suggestions = collectSuggestions(editor);
   }
 }
+
+export type ResolvedSuggestion = {
+  id: string;
+  sid: string;
+  action: "accepted" | "rejected";
+  del_text: string | null;
+  ins_text: string | null;
+  reason: string | null;
+  author: string;
+  resolved_at: string;
+};
