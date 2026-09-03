@@ -3,25 +3,62 @@
 # Albert - Book Manuscript Editor
 
 ## What This Is
-A collaborative manuscript editor for Albert Lin's memoir. The book covers his life as a National Geographic explorer, the search for Genghis Khan's tomb, losing his leg, his Lost Cities TV career, and his son Charlie's TBI recovery.
+A collaborative manuscript editor — originally built for Albert Lin's memoir, now multi-project
+(as of 2026-09-02). The memoir covers his life as a National Geographic explorer, the search for
+Genghis Khan's tomb, losing his leg, his Lost Cities TV career, and his son Charlie's TBI
+recovery — 22 chapters across 4 parts, ~92k words, book id `albert-lin-memoir`.
 
 ## Architecture
 - **Next.js 16 + TipTap** rich text editor with real-time collaboration
-- **Supabase** backend: `albert_documents` (chapters) + `albert_versions` (revision history)
+- **Supabase** backend, multi-book: `albert_books` (projects) → `albert_documents` (chapters,
+  scoped by `book_id`) → `albert_versions` (revision history), `albert_comments`,
+  `albert_chapter_summaries` + `albert_book_index` (see "Book index" below)
 - **Deployed** on Vercel: production deploys from main branch
+- Routes: `/` (all books) → `/b/[bookId]` (chapters in one book, grouped by part) → `/d/[id]`
+  (the editor)
 
 ## Database Schema
-- `albert_documents`: id, title, content (HTML), chapter_number, book_id, created_at, updated_at
+- `albert_books`: id, title, created_at
+- `albert_documents`: id, title, content (HTML), chapter_number, part_number, book_id,
+  created_at, updated_at — chapters have `chapter_number`; part-opener docs (title/epigraph
+  page) have `chapter_number = null` and `part_number` set; free-floating notes have both null.
+  No `status` column exists despite the `Document` TS type declaring one — use `select("*")`,
+  never an explicit column list, or Postgrest 400s.
 - `albert_versions`: id, document_id, content, title, message, created_at
 - `albert_comments`: id, document_id, content, author, from_pos, to_pos, quote, resolved,
-  created_at — **check this actually exists before assuming Comments works.** It didn't for
-  a long time (CommentsPanel.tsx queries it, but its migration was never run); SQL is on
-  `/setup` if it's missing again. No `status` column exists on `albert_documents` despite
-  the `Document` TS type declaring one — don't `select()` it explicitly, use `select("*")`.
-- Chapters have `chapter_number` for ordering; notes/planning docs have `chapter_number = null`
-- No direct Postgres connection available (no `DATABASE_URL`), only Supabase REST/service-role
-  keys — those can't run DDL. Schema changes need Derek to run SQL in the Supabase dashboard
-  (link + copyable SQL already on `/setup`, follow that pattern for new tables).
+  created_at
+- `albert_chapter_summaries` / `albert_book_index`: see "Book index" below.
+- **DDL access**: no `DATABASE_URL` in this project's own secrets, but `sourcelibrary`'s
+  secret-lover manifest has `SUPABASE_DB_URL` — same underlying Supabase project, shared with
+  sourcelibrary — which gives real Postgres access via the `postgres` npm package (already a
+  dependency). Run migration scripts with `cd ~/sourcelibrary && secret-lover run -- node
+  <absolute-path-to-albert-script>.mjs` (cwd controls which project's secrets inject; the
+  script's own path is unaffected). Delete the script when done — these are one-off DDL, not
+  part of the app. `/setup`'s copy-paste-SQL pattern is the fallback if that access ever breaks.
+
+## Book index
+Chapter and book-level summaries, built for answering synthesis questions ("what does the book
+say about X, across all chapters") without re-reading the whole manuscript. Researched against
+how Sudowrite/Novelcrafter/NovelAI and the map-reduce summarization literature handle this
+before building (structured summaries beat embeddings/RAG at this corpus size — 92k words
+doesn't need a vector store). Staleness is **computed on read**, never a stored flag: a chapter
+summary is stale iff `source_updated_at < albert_documents.updated_at`.
+```bash
+# Map step — one chapter -> one summary row. Skips chapters already fresh.
+secret-lover run -- node scripts/summarize-chapter.mjs --doc <document-id>
+secret-lover run -- node scripts/summarize-chapter.mjs --book <book-id> --all [--force]
+
+# Reduce step — refuses to run if any chapter's summary is stale.
+secret-lover run -- node scripts/reindex-book.mjs --book <book-id>
+```
+Uses Gemini (`gemini-3-flash-preview`) via direct REST call, not Claude — cheap enough to
+regenerate freely, per Derek. **The Gemini key must be albert's own project-scoped secret-lover
+entry**, not the global-scoped one — they hold different values and the global one is stale
+(401s). If this ever breaks again: `cd ~/sourcelibrary && secret-lover run -- node -e
+'process.stdout.write(process.env.GEMINI_API_KEY)'` piped straight into `secret-lover add
+GEMINI_API_KEY` from albert's own directory (never echo the value to a terminal line by itself).
+Re-run `summarize-chapter.mjs` for a chapter after any content change; re-run `reindex-book.mjs`
+after that.
 
 ## Working with the Manuscript
 - Chapters are stored as HTML in Supabase, editable via the web editor
@@ -31,9 +68,15 @@ A collaborative manuscript editor for Albert Lin's memoir. The book covers his l
   insertion/deletion suggestion marks (rendered inline + in the editor's
   Suggestions panel), not as applied prose. Derek/Albert accept or reject each
   change in the browser. See `notes/tool-research.md` for why.
-- Chapter IDs follow the pattern `ch-01`, `ch-02`, etc.
-- The import script is at `scripts/import-manuscript.mjs`
-- Original manuscript text files are in `~/Downloads/block{1,2,3}_chapters_*.txt`
+- **Text-in-git is the source of truth.** `manuscript/part{1,2,3,4}/*.txt` — one file per
+  chapter (`chNN-slug.txt`) plus a `00-part-opener.txt` per part that has a title/epigraph.
+  `scripts/split-manuscript.mjs` regenerates these from Albert's raw `~/Downloads/PART_*.txt`
+  drops; `scripts/import-book.mjs --book-id <id> --title "<title>" --confirm` rebuilds
+  Supabase FROM these files (dry-run without `--confirm`) — always this direction, git → DB,
+  never the reverse. `chapter_number` is the running number across all 4 parts (1–22, not
+  reset per part); `part_number` is 1–4.
+- Chapter document ids follow the pattern `<book-id>-ch-NN` (zero-padded); part openers are
+  `<book-id>-part-N`.
 
 ## For Albert (or Albert's Claude Code)
 - **Yellow highlighted blocks** (`background: #fef3c7`) are questions/requests for Albert
@@ -44,12 +87,20 @@ A collaborative manuscript editor for Albert Lin's memoir. The book covers his l
 
 ## Key Commands
 ```bash
-# Import manuscript from text files
-set -a; source .env.local; set +a; node scripts/import-manuscript.mjs
+# Split Albert's raw ~/Downloads/PART_*.txt drops into manuscript/part{1-4}/*.txt
+node scripts/split-manuscript.mjs
+
+# Rebuild a book in Supabase from the git manuscript/ files (dry run without --confirm)
+set -a; source .env.local; set +a
+node scripts/import-book.mjs --book-id albert-lin-memoir --title "..." --confirm
 
 # Propose AI edits to a chapter as reviewable suggestions (never overwrites)
 set -a; source .env.local; set +a
-node scripts/suggest-chapter.mjs --chapter 14 revised-ch14.txt --reason "continuity pass"
+node scripts/suggest-chapter.mjs --doc albert-lin-memoir-ch-14 revised-ch14.txt --reason "continuity pass"
+
+# Book index (see "Book index" above)
+secret-lover run -- node scripts/summarize-chapter.mjs --book albert-lin-memoir --all
+secret-lover run -- node scripts/reindex-book.mjs --book albert-lin-memoir
 
 # Type check
 npx tsc --noEmit
