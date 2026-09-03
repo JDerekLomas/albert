@@ -16,6 +16,7 @@ export default function CommentsPanel({
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showResolved, setShowResolved] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const identity = getIdentity();
 
@@ -46,8 +47,11 @@ export default function CommentsPanel({
     });
 
     if (!error) {
+      setPostError(null);
       setNewComment("");
       loadComments();
+    } else {
+      setPostError(error.message);
     }
   }
 
@@ -145,6 +149,9 @@ export default function CommentsPanel({
             Post
           </button>
         </div>
+        {postError && (
+          <p className="text-[11px] text-red-500 mt-2">{postError}</p>
+        )}
       </div>
 
       {/* Comments list */}

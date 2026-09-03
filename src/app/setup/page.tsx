@@ -17,6 +17,31 @@ CREATE POLICY "Allow all access to albert_documents" ON albert_documents
 
 ALTER PUBLICATION supabase_realtime ADD TABLE albert_documents;`;
 
+// albert_comments was never actually created — CommentsPanel.tsx has been
+// querying/inserting into a table that doesn't exist since it was built.
+// Discovered 2026-09-02 while trying to demo the feature; the insert fails
+// silently (no error shown), so clicking "Post" just does nothing.
+const COMMENTS_SQL = `CREATE TABLE IF NOT EXISTS albert_comments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  document_id text NOT NULL REFERENCES albert_documents(id) ON DELETE CASCADE,
+  content text NOT NULL,
+  author text NOT NULL,
+  from_pos integer NOT NULL DEFAULT 0,
+  to_pos integer NOT NULL DEFAULT 0,
+  quote text,
+  resolved boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_comments_doc ON albert_comments(document_id, created_at DESC);
+
+ALTER TABLE albert_comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all access to albert_comments" ON albert_comments
+  FOR ALL USING (true) WITH CHECK (true);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE albert_comments;`;
+
 export default function SetupPage() {
   const [status, setStatus] = useState<string | null>(null);
 
@@ -58,6 +83,21 @@ export default function SetupPage() {
       {status && (
         <p className="mt-4 text-sm text-zinc-600">{status}</p>
       )}
+
+      <h2 className="text-xl font-bold mt-10 mb-2">Missing: comments table</h2>
+      <p className="text-zinc-600 mb-6">
+        The Comments panel has been silently broken — <code>albert_comments</code> was
+        never created. Run this to fix it:
+      </p>
+      <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-lg text-sm overflow-x-auto mb-6">
+        {COMMENTS_SQL}
+      </pre>
+      <button
+        onClick={() => navigator.clipboard.writeText(COMMENTS_SQL)}
+        className="bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm"
+      >
+        Copy SQL
+      </button>
     </div>
   );
 }
