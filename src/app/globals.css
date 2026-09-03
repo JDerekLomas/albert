@@ -130,6 +130,14 @@ body {
   opacity: 0.75;
 }
 
+/* Default review view: the proposed text only. Deletions stay in the document
+   (accept/reject still needs them) but are collapsed out of the flow, so the
+   chapter reads as it would read if every suggestion were accepted. The
+   "Show original" checkbox drops this class to reveal them. */
+.hide-original .tiptap .suggestion-del {
+  display: none;
+}
+
 /* Comment anchors — text a comment applies to, distinct from suggestion marks */
 .tiptap .comment-highlight {
   background: #fef9c3;

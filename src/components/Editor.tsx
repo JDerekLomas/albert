@@ -36,6 +36,10 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [showIndex, setShowIndex] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionCount, setSuggestionCount] = useState(0);
+  // A pending suggestion is a del/ins pair, so showing both makes the page read
+  // twice — old text and new text interleaved. Default to the proposed reading
+  // (green only) and keep the struck-through original one checkbox away.
+  const [showOriginal, setShowOriginal] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
@@ -440,6 +444,22 @@ export default function Editor({ document: doc }: { document: Document }) {
               )}
             </button>
 
+            {/* Original-text toggle — only meaningful while suggestions are pending */}
+            {suggestionCount > 0 && (
+              <label
+                className="text-[11px] px-2 py-0.5 rounded transition-colors flex items-center gap-1 cursor-pointer select-none text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50"
+                title="Show the original wording each suggestion would replace"
+              >
+                <input
+                  type="checkbox"
+                  checked={showOriginal}
+                  onChange={(e) => setShowOriginal(e.target.checked)}
+                  className="w-3 h-3 accent-red-500 cursor-pointer"
+                />
+                Show original
+              </label>
+            )}
+
             {/* Comments toggle */}
             <button
               onClick={() => {
@@ -542,7 +562,11 @@ export default function Editor({ document: doc }: { document: Document }) {
               </div>
             </div>
           ) : (
-            <div className="max-w-3xl w-full mx-auto px-6 py-8">
+            <div
+              className={`max-w-3xl w-full mx-auto px-6 py-8${
+                showOriginal ? "" : " hide-original"
+              }`}
+            >
               <EditorContent editor={editor} />
             </div>
           )}
