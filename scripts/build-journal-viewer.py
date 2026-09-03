@@ -386,5 +386,5 @@ dlg.addEventListener('click',()=>dlg.close());
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=os.path.join(PHOTOS, "in-transitory.html"))
+    ap.add_argument("--out", default=os.path.join(PHOTOS, "in-transitory-journal.html"))
     build(ap.parse_args().out)
