@@ -61,6 +61,37 @@ Re-run `summarize-chapter.mjs` for a chapter after any content change; re-run `r
 after that.
 
 ## Working with the Manuscript
+
+**Start here: `scripts/chapter.mjs`.** One command for the whole editing loop, and
+it loads `.env.local` itself — no `set -a; source .env.local` dance, no throwaway
+`_tmp-*.mjs` scripts (three past sessions hand-rolled those and two got the HTML
+parsing subtly wrong).
+```bash
+node scripts/chapter.mjs status 14              # pending suggestions, comments, git sync, index staleness
+node scripts/chapter.mjs read   14 -o draft.txt # live chapter as editable plain text
+node scripts/chapter.mjs read   14 --accepted   # preview with all suggestions applied
+node scripts/chapter.mjs diff   14 draft.txt    # word-level diff BEFORE proposing anything
+node scripts/chapter.mjs suggest 14 draft.txt --reason "..."
+node scripts/chapter.mjs reject-all 14          # clear pending, restore the prose exactly
+node scripts/chapter.mjs accept-all 14
+node scripts/chapter.mjs pull   14              # live chapter -> git manuscript file
+```
+Takes a chapter number or a document id. `status` is the right first call on any
+chapter — it answers "is the DB ahead of git?" which nothing else does.
+
+**The divergence trap `pull` exists for:** the documented flow is git → DB only
+(`import-book.mjs`), so anything Albert accepts or types in the browser lives
+*only* in Supabase and the next import silently destroys it. After Albert reviews
+a chapter, run `pull`, eyeball `git diff --word-diff=color`, and commit — then git
+is authoritative again. `pull` refuses while suggestions are unresolved.
+
+**Parsing gotcha, if you ever write your own script:** attribute order on
+suggestion marks is not stable. `suggest-chapter.mjs` writes `data-suggest` first;
+TipTap re-serializes it *after* `data-sid` as soon as a human opens the chapter in
+the browser. Anything anchored on `<span data-suggest=` silently matches nothing on
+a chapter someone has looked at. `chapter.mjs` matches the attribute anywhere in
+the tag — reuse that, don't re-derive it.
+
 - Chapters are stored as HTML in Supabase, editable via the web editor
 - **Never write a chapter's `content` directly with the service role key.** Propose
   edits with `scripts/suggest-chapter.mjs` instead — it diffs a revised draft

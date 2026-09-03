@@ -51,3 +51,51 @@ comes before the call to prayer; several bracketed author queries left in
 
 ## Bracketed queries still live in the text
 Search: `grep -rn "\[" manuscript/part3/`
+
+---
+
+## Ch14 revision plan (2026-09-03) — expansion pass
+
+Purpose the chapter is serving, as inferred: the hinge of Part 3 and the summit of
+the father thread. The boy who was made to feel he didn't belong in Cambridge
+returns to his father's world, stands in the hall, and states the question the
+rest of the book answers in lived form rather than argument.
+
+Diagnosis: at 1,191 words it is by far the shortest chapter in the book (neighbours
+run 4,000–8,000). It skips the thing it exists for — the lecture is one paragraph
+carrying one third of the argument, the room never reacts, and it ends on a hard
+cut to Covid.
+
+Moves, all sourced — nothing invented:
+1. **Popper.** The first Darwin Lecture was Karl Popper's "Natural Selection and
+   the Emergence of Mind", arguing selection operates inside the conscious mind —
+   "the greatest marvel of our universe". Grounds "a storied stage" and answers the
+   imposter question with a fact: he was continuing that first sentence, not
+   visiting. Source: reference/enigma-of-mind-lin-lomas.txt L242–262.
+2. **The whole argument, not a third of it.** Restore the three legs he actually
+   published — variation via imagination, replication via sympathy/resonance,
+   selection via harmony — and let him admit he could only stand on the first.
+   That admission is what makes Part 4 the answer: he had *lived* resonance and
+   harmony without being able to prove them. Source: L289–341, L979–1043, L1443ff.
+3. **The concrete enigma.** The litany ("each ecology had grown its own tools") has
+   a hard number behind it: 200+ hallucinogenic plant species in the Americas,
+   one-tenth as many across all Eurasia and Africa, and the imbalance is itself an
+   unsolved problem. That is an actual enigma for a lecture on enigmas. Source: L674–722.
+4. **Name the father.** Douglas Lin. Never appears anywhere in the manuscript;
+   appears in the published dedication.
+5. **End on the dedication, not on Covid.** Two years later the chapter appeared in
+   print dedicated "to our respective fathers, Douglas Lin and Robert Lomas". Robert
+   Lomas is Bob from Ch05 — the dowser who promised Albert a fish before Mongolia.
+   The fish is the book's spine (Ch01 Millie, Ch05 the trout, Ch07 Millie again
+   hours before the accident, Ch22 "There was something on the other end").
+   Source: L2012–2015.
+6. **Bracketed queries** for everything only Albert has: the room, whether anyone
+   asked a question, whether his father heard it, what the walk out was like.
+   I do not have this material and will not invent it.
+
+Voice guardrail applied: litany fragments modelled on the existing "Drums on a
+sacred mountain in Mongolia." run; retrospect ("It would surface in me for years",
+Ch13) licenses the forward-looking handoff to Part 4.
+
+Delivery: one suggestion pass via scripts/suggest-chapter.mjs. Albert's existing
+sentences are preserved verbatim wherever possible so the diff is additive.
