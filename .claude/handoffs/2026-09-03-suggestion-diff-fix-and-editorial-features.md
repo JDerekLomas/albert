@@ -51,6 +51,18 @@ pattern (dialogue-attribution paragraph starting right before a quote) recurs,
 but I did not do a full-book audit — this was a one-off catch, not a proof the
 rest of the book is clean.
 
+**Follow-up (later on 2026-09-03, commit `1386361`)**: a bug with this exact
+signature was found and fixed in `suggest-chapter.mjs` — `splitSentences`
+silently dropped text whenever terminal `.!?` was followed by a closing quote
+or marker instead of whitespace, which is precisely how `I told him, "I can't
+lose you again."` collapses to a bare `"`. **It is not the cause of the Ch22
+loss**, though: Ch22 had no `Before AI suggestions` version predating the
+corruption, so nothing had run this code on it. Two independent instances of
+the same failure mode; the import path remains unexplained. A full-book audit
+was done this time — all 22 live chapters were compared against the git
+manuscript and scanned for orphan-fragment paragraphs, and nothing else is
+damaged.
+
 ## Left for Albert, not resolved by me
 
 Posted as a comment on Ch22 (not a suggestion — this is a judgment call about
