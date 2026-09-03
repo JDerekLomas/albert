@@ -14,9 +14,14 @@
  *   node scripts/suggest-chapter.mjs --doc <document-id> revised.txt --reason "tightened Cambridge section"
  *
  * Revised text format: plain text, paragraphs separated by one or more blank
- * lines — same convention as manuscript/part3/*.txt. Any paragraph copied
- * unchanged from the current chapter is left alone (matched by exact text);
- * only genuinely changed paragraphs generate suggestions.
+ * lines — same convention as manuscript/part3/*.txt, including its leading
+ * "CHAPTER N" / title lines (stripped automatically — the title lives in the
+ * document's `title` column, not its body) and "---" scene-break markers
+ * (matched against the stored document's <hr> blocks, not treated as prose).
+ * Any paragraph copied unchanged from the current chapter is left alone
+ * (matched by exact text — italic/bold markdown and em/strong tags are
+ * normalized first, so formatting alone doesn't look like a change); only
+ * genuinely changed paragraphs generate suggestions.
  */
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "fs";
@@ -97,6 +102,14 @@ function normalize(text) {
   return text.replace(/\s+/g, " ").trim();
 }
 
+/** <em>/<i> -> *x*, <strong>/<b> -> **x** — so stored HTML and a plain-text
+ * markdown-ish draft compare equal when only the tag/marker form differs. */
+function htmlEmphasisToMarkdown(html) {
+  return html
+    .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, "**$2**")
+    .replace(/<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi, "*$2*");
+}
+
 function escapeHtml(s) {
   return s
     .replace(/&/g, "&amp;")
@@ -147,7 +160,7 @@ function splitBlocks(html) {
   while ((m = re.exec(html))) {
     const raw = m[0];
     const tag = (m[1] || "hr").toLowerCase();
-    const text = normalize(raw.replace(/<[^>]+>/g, ""));
+    const text = normalize(htmlEmphasisToMarkdown(raw).replace(/<[^>]+>/g, ""));
     blocks.push({ tag, html: raw, text });
   }
   return blocks;
@@ -180,11 +193,14 @@ async function main() {
   }
 
   const currentHtml = doc.content || "";
-  const revisedText = readFileSync(filePath, "utf8");
+  let revisedText = readFileSync(filePath, "utf8");
+  // Drop a leading "CHAPTER N" + title pair (manuscript/part3/*.txt convention)
+  // — that's stored in the document's title column, not its body.
+  revisedText = revisedText.replace(/^\s*CHAPTER\s+\d+\s*\n[^\n]*\n/i, "");
   const newParagraphs = revisedText
     .split(/\n\s*\n+/)
     .map((p) => normalize(p))
-    .filter(Boolean);
+    .filter((p) => p && p !== "---"); // scene breaks are structural, not prose
 
   const oldBlocks = splitBlocks(currentHtml).map((b, origIndex) => ({
     ...b,
@@ -216,7 +232,7 @@ async function main() {
     const run = runs[i];
 
     if (run.type === "equal") {
-      for (const text of run.items) {
+      for (let k = 0; k < run.items.length; k++) {
         const block = oldPBlocks[pPointer++];
         anchoredHtml.set(block.origIndex, block.html); // reuse verbatim — keeps inline formatting
         lastAnchoredOrigIndex = block.origIndex;
