@@ -29,6 +29,13 @@ REDACTION = ("[Withheld from this view: a page of contact details — names, "
 IMG_PX, IMG_Q = 1500, 55
 REDACT_INNER_TRIM = 0.09   # fraction to shave off the gutter edge of a kept half
 
+# Some spreads were photographed twice. The transcriptions of each pair agree
+# word for word, so showing both would just repeat a page in the scroll.
+# Keeper chosen on sharpness (variance of Laplacian), except 9961/9962 where
+# the two are within 3% and the tighter framing of 9961 wins instead.
+#   dropped frame -> frame kept in its place
+DUPES = {"IMG_9947": "IMG_9948", "IMG_9957": "IMG_9956", "IMG_9962": "IMG_9961"}
+
 
 def capture_time(stem):
     for ext in (".HEIC", ".jpg"):
@@ -125,6 +132,14 @@ def build(outpath):
     stems = sorted(f[:-3] for f in os.listdir(TRANSCRIPTS) if f.endswith(".md"))
     if not stems:
         sys.exit("no transcripts yet")
+    # Collapse re-shot spreads, but only when the frame kept in their place is
+    # actually present — otherwise dropping one would lose the page entirely.
+    dropped = [s for s in stems if DUPES.get(s) in stems]
+    stems = [s for s in stems if s not in dropped]
+    if dropped:
+        print("collapsed duplicate frames: " +
+              ", ".join(f"{s}→{DUPES[s]}" for s in dropped))
+
     items = []
     for stem in stems:
         d = parse(os.path.join(TRANSCRIPTS, stem + ".md"))
