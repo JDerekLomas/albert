@@ -17,7 +17,12 @@ A collaborative manuscript editor for Albert Lin's memoir. The book covers his l
 
 ## Working with the Manuscript
 - Chapters are stored as HTML in Supabase, editable via the web editor
-- To update a chapter programmatically, use the Supabase REST API with the service role key
+- **Never write a chapter's `content` directly with the service role key.** Propose
+  edits with `scripts/suggest-chapter.mjs` instead — it diffs a revised draft
+  against the live chapter and writes the changes back as pending
+  insertion/deletion suggestion marks (rendered inline + in the editor's
+  Suggestions panel), not as applied prose. Derek/Albert accept or reject each
+  change in the browser. See `notes/tool-research.md` for why.
 - Chapter IDs follow the pattern `ch-01`, `ch-02`, etc.
 - The import script is at `scripts/import-manuscript.mjs`
 - Original manuscript text files are in `~/Downloads/block{1,2,3}_chapters_*.txt`
@@ -33,6 +38,10 @@ A collaborative manuscript editor for Albert Lin's memoir. The book covers his l
 ```bash
 # Import manuscript from text files
 set -a; source .env.local; set +a; node scripts/import-manuscript.mjs
+
+# Propose AI edits to a chapter as reviewable suggestions (never overwrites)
+set -a; source .env.local; set +a
+node scripts/suggest-chapter.mjs --chapter 14 revised-ch14.txt --reason "continuity pass"
 
 # Type check
 npx tsc --noEmit

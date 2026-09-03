@@ -12,9 +12,19 @@ before it becomes the text. Two mechanisms give us that:
    - undo everything I did: `git checkout -- manuscript/`
    - a chapter's whole history: `git log -p manuscript/part3/ch14-the-question.txt`
 
-2. **The web editor (needs the Supabase keys fixed — see below).** TipTap editor +
-   version history + clickable diff restore + comments panel, already built in this
-   repo. That's the one for Albert, who is not going to run git.
+2. **The web editor.** TipTap editor + version history + clickable diff restore +
+   comments panel, already built in this repo. That's the one for Albert, who is
+   not going to run git. As of 2026-09-02 it also has a **Suggestions panel**:
+   `node scripts/suggest-chapter.mjs --chapter <N> <revised.txt> --reason "..."`
+   diffs a revised draft against the live chapter and writes the changes back as
+   pending insertion/deletion marks — visible inline (green/red) and in the
+   Suggestions sidebar — instead of overwriting the chapter directly. Nothing is
+   final until Derek or Albert clicks Accept/Reject (or Accept all/Reject all).
+   The script snapshots a pre-suggestion version first, so `git`-style rollback
+   still exists even for changes made this way. See
+   `notes/tool-research.md` for the design rationale and
+   `src/lib/suggestion-marks.ts` / `scripts/suggest-chapter.mjs` for the
+   implementation.
 
 ## Division of labour — what AI is actually good for here
 Ranked by how much value it adds to a memoir, most to least:
@@ -50,8 +60,3 @@ Ranked by how much value it adds to a memoir, most to least:
 - **Voice guardrail.** Before any suggested line, I should be able to point at an
   existing sentence of Albert's it's modelled on.
 
-## Blocker: the Supabase keys are dead
-The web editor can't read or write the manuscript right now. Supabase disabled
-legacy `anon` / `service_role` API keys on 2026-06-01; both keys in `.env.local`
-return `{"message":"Legacy API keys are disabled"}`. Fix is four clicks in the
-dashboard — steps are in the session notes / ask Claude.
