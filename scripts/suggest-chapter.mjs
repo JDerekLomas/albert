@@ -306,6 +306,30 @@ async function main() {
   }
 
   const currentHtml = doc.content || "";
+
+  // Refuse to stack a second pass on unresolved suggestions. splitBlocks()
+  // strips tags to get each paragraph's text, so a pending del/ins pair reads
+  // as both wordings run together ("Derek, my old best friend from college,
+  // Derek had been...") — diffing a clean draft against that yields nonsense
+  // suggestions nested inside the existing ones. Attribute order varies
+  // (the script writes data-suggest first, TipTap writes it after data-sid),
+  // so match the attribute anywhere in the tag.
+  const pendingSids = new Set(
+    [...currentHtml.matchAll(/<span\b[^>]*\bdata-suggest="(?:ins|del)"[^>]*\bdata-sid="([^"]+)"/g)].map((m) => m[1])
+  );
+  for (const m of currentHtml.matchAll(/<span\b[^>]*\bdata-sid="([^"]+)"[^>]*\bdata-suggest="(?:ins|del)"/g)) {
+    pendingSids.add(m[1]);
+  }
+  if (pendingSids.size > 0) {
+    console.error(
+      `"${doc.title}" already has ${pendingSids.size} unresolved suggestion(s).\n` +
+        "Accept or reject them in the editor's Suggestions panel first — a second\n" +
+        "pass would diff against the old and new wording run together and produce\n" +
+        "garbage. (Reject All in the panel restores the chapter untouched.)"
+    );
+    process.exit(1);
+  }
+
   let revisedText = readFileSync(filePath, "utf8");
   // Drop a leading "CHAPTER N" + title pair (manuscript/part3/*.txt convention)
   // — that's stored in the document's title column, not its body.
