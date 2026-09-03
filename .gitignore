@@ -45,3 +45,6 @@ mcp-server/package-lock.json
 # Manuscript source photos pulled from Google Photos (large binaries, not for git)
 /notebook-photos/
 /notebook-photos-excluded/
+
+# secret-lover manifest (names only, no values)
+.secrets.json
