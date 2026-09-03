@@ -120,23 +120,65 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
+/** Inverse of htmlEmphasisToMarkdown. Diffing happens on markdown-normalized
+ * text, so every rendered span has to convert the markers back — otherwise a
+ * paragraph that merely *contains* italics loses them to literal asterisks the
+ * moment any other part of it is edited. Only balanced pairs within this one
+ * span convert; a marker split across a del/ins boundary stays literal rather
+ * than emitting an unclosed tag. */
+function markdownEmphasisToHtml(escaped) {
+  return escaped
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+/** Render prose text (markdown-normalized) as safe HTML with emphasis intact. */
+function renderProse(s) {
+  return markdownEmphasisToHtml(escapeHtml(s));
+}
+
 function escapeAttr(s) {
   return escapeHtml(s).replace(/"/g, "&quot;");
 }
 
+/** Words, whitespace runs, and whole emphasis runs. An emphasis run
+ * (`*like this*`, trailing punctuation included) is one atomic token so a
+ * word-level diff can't split it across a del/ins boundary and strand an
+ * unbalanced marker, which renderProse would then have to leave literal. */
 function wordTokens(text) {
-  return text.match(/\S+|\s+/g) || [];
+  return text.match(/\*\*[^*]+\*\*\S*|\*[^*]+\*\S*|\S+|\s+/g) || [];
 }
 
 function suggestionSpan(type, text, sid, reason, author) {
   const reasonAttr = reason ? ` data-reason="${escapeAttr(reason)}"` : "";
   return `<span data-suggest="${type}" data-sid="${sid}" data-author="${escapeAttr(
     author
-  )}"${reasonAttr}>${escapeHtml(text)}</span>`;
+  )}"${reasonAttr}>${renderProse(text)}</span>`;
 }
 
+/**
+ * Split into sentences by scanning for boundaries rather than matching whole
+ * sentences, so the pieces always reassemble into the input. A terminal `.!?`
+ * run may be followed by closing marks (`" ' ” ’ * ) ]`) before the boundary —
+ * dialogue ending in `."` is the common case. The previous match-based regex
+ * required whitespace immediately after the punctuation and, when it did not
+ * find any, silently DROPPED everything up to the next place it could match:
+ * `He said, "Stop."` reduced to a bare `"`.
+ */
 function splitSentences(text) {
-  return (text.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) || [text]).map((s) => s.trim()).filter(Boolean);
+  const out = [];
+  const boundary = /[.!?]+["'”’*)\]]*(?=\s|$)/g;
+  let start = 0;
+  let m;
+  while ((m = boundary.exec(text))) {
+    const end = m.index + m[0].length;
+    const piece = text.slice(start, end).trim();
+    if (piece) out.push(piece);
+    start = end;
+  }
+  const rest = text.slice(start).trim();
+  if (rest) out.push(rest);
+  return out.length ? out : [text];
 }
 
 /** Fraction of words two sentences share — cheap proxy for "same sentence, lightly edited" vs. "rewritten". */
@@ -155,7 +197,7 @@ function fineWordDiffSpans(oldText, newText, sid, reason, author) {
   for (const run of runs) {
     const text = run.items.join("");
     if (!text) continue;
-    if (run.type === "equal") html += escapeHtml(text);
+    if (run.type === "equal") html += renderProse(text);
     else if (run.type === "delete") html += suggestionSpan("del", text, sid, reason, author);
     else html += suggestionSpan("ins", text, sid, reason, author);
   }
@@ -189,7 +231,7 @@ function wordDiffHtml(oldText, newText, sid, reason, author) {
     const run = runs[i];
 
     if (run.type === "equal") {
-      html += run.items.map((s) => escapeHtml(s)).join(" ") + " ";
+      html += run.items.map((s) => renderProse(s)).join(" ") + " ";
       continue;
     }
 
