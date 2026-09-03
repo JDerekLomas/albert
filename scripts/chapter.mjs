@@ -16,9 +16,15 @@
  *   node scripts/chapter.mjs read    14 -o f.txt   ...to a file, ready to edit
  *   node scripts/chapter.mjs diff    14 draft.txt  what a draft would change
  *   node scripts/chapter.mjs suggest 14 draft.txt --reason "..."
+ *   node scripts/chapter.mjs suggestions 14     audit the pending diff's SHAPE
  *   node scripts/chapter.mjs reject-all 14      clear pending, restore prose
  *   node scripts/chapter.mjs accept-all 14      apply pending
  *   node scripts/chapter.mjs pull    14         live chapter -> git manuscript
+ *   node scripts/chapter.mjs ref     14 "fish"  grep the Enigmas source w/ line nos
+ *   node scripts/chapter.mjs ref     14 1425-1440   read those lines
+ *
+ * Always run `suggestions` after `suggest`, before telling a human to review.
+ * A pass can look plausible and still be unreviewable — see the CHURN warning.
  *
  * `pull` exists because the documented flow is git -> DB only, so anything
  * Albert accepts or types in the browser is invisible to git and would be
@@ -124,6 +130,33 @@ function manuscriptToText(raw) {
     .join(" ").replace(/[*_]/g, "").replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Detect HTML that has leaked out of an attribute and into the visible prose.
+ * Ch22 carries a real instance: a hand-rolled script wrote an unescaped
+ * data-reason containing a quote, the attribute terminated early, and the rest
+ * of it — `…on this pass).">` — became part of the sentence. It survives both
+ * accept and reject, because it is prose now, so nothing in the review UI can
+ * clear it. Cheap to check on every status call; expensive to find by eye.
+ */
+function corruption(html) {
+  const out = [];
+  for (const view of ["original", "accepted"]) {
+    const text = toText(resolveSuggestions(html, view === "accepted" ? "ins" : "del"));
+    for (const [re, label] of [
+      [/">/, 'stray `">` — an attribute that terminated early'],
+      [/data-(?:suggest|sid|reason|author)/, "literal data-* attribute name in the text"],
+      [/&(?:quot|amp|lt|gt|#39);/, "unrendered HTML entity"],
+      [/<\/?span/i, "literal <span> in the text"],
+    ]) {
+      const m = text.match(re);
+      if (!m) continue;
+      const at = text.indexOf(m[0]);
+      out.push(`[${view}] ${label}: …${text.slice(Math.max(0, at - 60), at + 60)}…`);
+    }
+  }
+  return out;
+}
+
 // ---- locating things ----------------------------------------------------
 function manuscriptPath(chapterNumber) {
   for (const part of [1, 2, 3, 4]) {
@@ -213,6 +246,11 @@ switch (cmd) {
     }
     console.log(`  index          ${!sum ? "never built"
       : sum.source_updated_at < doc.updated_at ? "STALE — rerun summarize-chapter.mjs" : "fresh"}`);
+    const problems = corruption(doc.content);
+    if (problems.length) {
+      console.log(`  CORRUPTION     ${problems.length} sign(s) of leaked markup in the prose:`);
+      for (const p of problems) console.log(`                 ${p}`);
+    }
     break;
   }
 
@@ -265,6 +303,90 @@ switch (cmd) {
       }))
     );
     console.log(`${cmd}: ${sids.size} suggestion(s) resolved on "${doc.title}".`);
+    break;
+  }
+
+  case "suggestions": {
+    // Audit view. A suggestion pass can look fine in the browser and still be
+    // unreviewable: a one-word edit rendered as "delete 93 words, insert 93
+    // words" reads as a rewrite. Check the shape here before asking a human.
+    const groups = new Map();
+    const re = /<span\b([^>]*)>([\s\S]*?)<\/span>/g;
+    let mm;
+    while ((mm = re.exec(doc.content))) {
+      const type = mm[1].match(/data-suggest="(ins|del)"/)?.[1];
+      if (!type) continue;
+      const sid = mm[1].match(/data-sid="([^"]+)"/)?.[1] ?? "?";
+      if (!groups.has(sid)) groups.set(sid, { at: mm.index, del: [], ins: [] });
+      groups.get(sid)[type].push(mm[2].replace(/<[^>]+>/g, ""));
+    }
+    if (!groups.size) { console.log("No pending suggestions."); break; }
+    const words = (s) => (s.trim() ? s.trim().split(/\s+/).length : 0);
+    const rows = [...groups.values()].sort((a, b) => a.at - b.at);
+    let churn = 0;
+    rows.forEach((g, i) => {
+      const d = g.del.join(" "), n = g.ins.join(" ");
+      const dw = words(d), nw = words(n);
+      const kind = !dw ? "INSERT" : !nw ? "DELETE" : "REPLACE";
+      // Both sides long = the reader must re-read a whole block to find the edit.
+      const bad = kind === "REPLACE" && dw > 12 && nw > 12;
+      if (bad) churn++;
+      console.log(`${String(i + 1).padStart(3)}. ${kind.padEnd(7)} -${String(dw).padStart(3)}w +${String(nw).padStart(3)}w${bad ? "  <-- CHURN: whole block replaced" : ""}`);
+      const show = (p, s) => s.trim() && console.log(`     ${p} ${s.trim().slice(0, 160)}${s.trim().length > 160 ? "…" : ""}`);
+      show("-", d); show("+", n);
+    });
+    const del = rows.reduce((a, g) => a + words(g.del.join(" ")), 0);
+    const ins = rows.reduce((a, g) => a + words(g.ins.join(" ")), 0);
+    console.log(`\n${rows.size ?? rows.length} suggestions · +${ins}w / -${del}w`);
+    if (churn) console.log(`WARNING: ${churn} suggestion(s) replace a whole block to change a few words.`);
+    const empty = (doc.content.match(/<span[^>]*data-suggest="(?:ins|del)"[^>]*>\s*<\/span>/g) || []).length;
+    if (empty) console.log(`WARNING: ${empty} empty span(s) — a previous reject-all likely left empty paragraphs.`);
+    break;
+  }
+
+  case "ref": {
+    // Quote the Enigmas source with line numbers, so a claim can be checked
+    // against the text instead of remembered. See reference/enigma-of-mind-INDEX.md
+    const file = join(ROOT, "reference", "enigma-of-mind-lin-lomas.txt");
+    const lines = readFileSync(file, "utf8").split("\n");
+    const range = rest.find((a) => /^\d+-\d+$/.test(a));
+    if (range) {
+      const [a, b] = range.split("-").map(Number);
+      lines.slice(a - 1, b).forEach((l, k) => console.log(`${String(a + k).padStart(5)}  ${l}`));
+      break;
+    }
+    const q = rest.filter((a) => !a.startsWith("-")).join(" ");
+    if (!q) { console.error('usage: ref <n> "search terms" | ref <n> 1425-1440'); process.exit(1); }
+    // Search the flattened text, not line by line: this source is hard-wrapped
+    // mid-sentence, so "slippery fish" and most quotable phrases straddle a
+    // newline and never match a single line.
+    const starts = [];
+    let acc = 0;
+    for (const l of lines) { starts.push(acc); acc += l.length + 1; }
+    // This text came out of a PDF and keeps typographic ligatures, so a search
+    // for "fish" misses "ﬁsh" and "flames" misses "ﬂames". Fold both sides.
+    // Same character count, so line mapping still holds.
+    const fold = (s) => s
+      .replace(/ﬀ/g, "ff").replace(/ﬁ/g, "fi").replace(/ﬂ/g, "fl")
+      .replace(/ﬃ/g, "ffi").replace(/ﬄ/g, "ffl")
+      .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+      .replace(/[–—]/g, "-");
+    const flat = fold(lines.join(" "));
+    const rx = new RegExp(fold(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+"), "gi");
+    const lineOf = (off) => {
+      let lo = 0, hi = starts.length - 1;
+      while (lo < hi) { const mid = (lo + hi + 1) >> 1; starts[mid] <= off ? (lo = mid) : (hi = mid - 1); }
+      return lo + 1;
+    };
+    let hits = 0, mt;
+    while ((mt = rx.exec(flat))) {
+      hits++;
+      const ln = lineOf(mt.index);
+      const ctx = flat.slice(Math.max(0, mt.index - 90), mt.index + mt[0].length + 90).replace(/\s+/g, " ");
+      console.log(`L${ln}  …${ctx}…\n`);
+      if (hits >= 12) { console.log("(more matches suppressed)"); break; }
+    }
+    console.log(`${hits} match(es). Read a range with: ref ${target} <start>-<end>`);
     break;
   }
 

@@ -50,6 +50,35 @@ Ranked by how much value it adds to a memoir, most to least:
 - "Polishing." Most of what an LLM calls polish is homogenisation. The odd
   constructions ("We filmed in jungles rivers, deserts") are often the human part.
 
+## Before you propose prose — the checklist
+
+Written after a bad pass on Ch14 on 2026-09-03. Every item is here because it was
+skipped that day.
+
+1. **Read the source all the way through, not the summary.** The session read about
+   half of `reference/enigma-of-mind-lin-lomas.txt` and wrote the lecture scene from
+   the summary page. Result: flat paraphrase ("feelings copy… the way a string will
+   sound when you pluck its twin") while the unread sections held drums answering each
+   other across a room, Durkheim's clan "vibrating sympathetically", and a Maya glyph
+   for conjuring a vision that is *a fish held in a hand* — in a book whose spine is a
+   fish. The material always beats the paraphrase. Start at
+   `reference/enigma-of-mind-INDEX.md`, then read the actual lines.
+2. **Check every added fact against the text.** That pass invented a detail about
+   Albert's father's field, moved Bob Lomas's map scene to the wrong night, and made up
+   an audience size for Jamie's IMAX show. Use `chapter.mjs ref <n> "phrase"` — it
+   folds the PDF's ligatures, so a plain grep for "fish" that returns nothing is a
+   false negative, not an absence.
+3. **Audit the diff's shape before handing it to a human**: `chapter.mjs suggestions
+   <n>`. A pass can be semantically fine and still unreviewable. That day it marked
+   494 words deleted to make 8 words of edits, because a one-word change was rendered
+   as delete-the-paragraph/insert-the-paragraph. Watch for the CHURN warning.
+4. **Count what you are adding.** 844 words of my prose into a 1,191-word chapter is
+   not an edit, it is a co-write, and nobody asked for one. If the honest diagnosis is
+   "this chapter is thin because Albert hasn't written the room yet", the deliverable
+   is a bracketed question, not filler in his voice.
+5. **Name the sentence of Albert's each suggested line is modelled on.** If you can't,
+   don't suggest the line.
+
 ## Tactics
 - **Chapter-at-a-time.** One chapter, one conversation, one diff. Don't let me touch
   seven chapters in a turn.

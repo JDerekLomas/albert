@@ -72,10 +72,23 @@ node scripts/chapter.mjs read   14 -o draft.txt # live chapter as editable plain
 node scripts/chapter.mjs read   14 --accepted   # preview with all suggestions applied
 node scripts/chapter.mjs diff   14 draft.txt    # word-level diff BEFORE proposing anything
 node scripts/chapter.mjs suggest 14 draft.txt --reason "..."
+node scripts/chapter.mjs suggestions 14         # AUDIT the pending diff's shape — always run this
 node scripts/chapter.mjs reject-all 14          # clear pending, restore the prose exactly
 node scripts/chapter.mjs accept-all 14
 node scripts/chapter.mjs pull   14              # live chapter -> git manuscript file
+node scripts/chapter.mjs ref    14 "fish glyph" # search the Enigmas source, with line numbers
+node scripts/chapter.mjs ref    14 1425-1440    # read those lines
 ```
+**Run `suggestions` after every `suggest`, before asking a human to review.** A pass
+can read plausibly and still be unreviewable: on 2026-09-03 one marked 494 words
+deleted to deliver 8 words of edits. The command flags that as CHURN.
+
+**Editorial work on Ch14, Ch18, or Part 4 starts at
+`reference/enigma-of-mind-INDEX.md`** — the index to the published Darwin Lecture
+chapter Albert and Derek wrote, which is the answer memoir Ch14 withholds. It has a
+section map with line anchors and the 22 best concrete facts. Read the indexed lines,
+not a summary of them; `notes/workflow.md` explains what went wrong when a session
+worked from the summary instead.
 Takes a chapter number or a document id. `status` is the right first call on any
 chapter — it answers "is the DB ahead of git?" which nothing else does.
 
