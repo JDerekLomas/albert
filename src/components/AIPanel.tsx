@@ -195,15 +195,17 @@ export default function AIPanel({
           <button
             onClick={() => onInsert(lastAssistantMessage.content)}
             className="flex-1 text-xs py-1.5 bg-zinc-900 text-white rounded font-medium hover:bg-zinc-800 transition-colors"
+            title="Adds as a pending suggestion — nothing is applied until it's accepted"
           >
-            Insert at cursor
+            Suggest insertion
           </button>
           {selectedText && (
             <button
               onClick={() => onReplace(lastAssistantMessage.content)}
               className="flex-1 text-xs py-1.5 border border-zinc-200 rounded font-medium hover:bg-zinc-50 transition-colors"
+              title="Adds as a pending suggestion — nothing is applied until it's accepted"
             >
-              Replace selection
+              Suggest replacement
             </button>
           )}
           <button

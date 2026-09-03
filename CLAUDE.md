@@ -68,6 +68,14 @@ after that.
   insertion/deletion suggestion marks (rendered inline + in the editor's
   Suggestions panel), not as applied prose. Derek/Albert accept or reject each
   change in the browser. See `notes/tool-research.md` for why.
+- **The in-app "AI" panel (`AIPanel.tsx`) follows the same rule.** "Suggest insertion" /
+  "Suggest replacement" wrap the AI's output in `suggestionInsert`/`suggestionDelete` marks
+  client-side (`Editor.tsx`'s `handleInsert`/`handleReplace`) rather than writing it straight
+  into the doc — so a browser-only session (no credentials, no scripts, just the link) can
+  still only ever *propose* edits, never apply them silently. Backed by Gemini
+  (`gemini-3-flash-preview`) via `/api/ai`, not Claude — the stored `ANTHROPIC_API_KEY` (both
+  locally and on Vercel) is dead; don't spend time trying to revive it, just use Gemini like
+  everything else here does.
 - **Text-in-git is the source of truth.** `manuscript/part{1,2,3,4}/*.txt` — one file per
   chapter (`chNN-slug.txt`) plus a `00-part-opener.txt` per part that has a title/epigraph.
   `scripts/split-manuscript.mjs` regenerates these from Albert's raw `~/Downloads/PART_*.txt`

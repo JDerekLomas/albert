@@ -7,6 +7,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import { useEffect, useRef, useCallback, useState } from "react";
 import NextLink from "next/link";
+import { nanoid } from "nanoid";
 import { supabase, Document } from "@/lib/supabase";
 import { createChannel, subscribeChannel, getIdentity, Peer } from "@/lib/presence";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -119,22 +120,41 @@ export default function Editor({ document: doc }: { document: Document }) {
     setTimeout(() => setToast(null), 2000);
   }
 
+  // AI panel output never lands as live text — it's wrapped in the same
+  // suggestion marks suggest-chapter.mjs uses, so it shows up in the
+  // Suggestions panel for review instead of silently rewriting the chapter.
   function handleInsert(text: string) {
     if (!editor) return;
-    editor.chain().focus().insertContent(text).run();
-    showToast("Inserted");
+    const sid = nanoid(8);
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "text",
+        text,
+        marks: [{ type: "suggestionInsert", attrs: { sid, author: "claude (AI panel)" } }],
+      })
+      .run();
+    showToast("Suggested — review in Suggestions panel");
   }
 
   function handleReplace(text: string) {
     if (!editor) return;
     const { from, to } = editor.state.selection;
+    const sid = nanoid(8);
     editor
       .chain()
       .focus()
-      .deleteRange({ from, to })
-      .insertContent(text)
+      .setTextSelection({ from, to })
+      .setMark("suggestionDelete", { sid, author: "claude (AI panel)" })
+      .setTextSelection(to)
+      .insertContent({
+        type: "text",
+        text,
+        marks: [{ type: "suggestionInsert", attrs: { sid, author: "claude (AI panel)" } }],
+      })
       .run();
-    showToast("Replaced");
+    showToast("Suggested — review in Suggestions panel");
   }
 
   // Markdown source view

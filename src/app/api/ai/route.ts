@@ -1,9 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const GEMINI_MODEL = "gemini-3-flash-preview";
 
 export async function POST(req: NextRequest) {
   const { prompt, context, mode } = await req.json();
@@ -31,34 +28,55 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const response = await client.messages.stream({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 4096,
-          system,
-          messages: [{ role: "user", content: userMessage }],
-        });
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: userMessage }] }],
+              systemInstruction: { parts: [{ text: system }] },
+            }),
+          }
+        );
 
-        for await (const event of response) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
-            );
+        if (!geminiRes.ok || !geminiRes.body) {
+          const errText = await geminiRes.text();
+          throw new Error(`Gemini API error ${geminiRes.status}: ${errText}`);
+        }
+
+        const reader = geminiRes.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const payload = line.slice(6);
+            try {
+              const parsed = JSON.parse(payload);
+              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+              }
+            } catch {
+              // skip malformed chunks
+            }
           }
         }
 
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
-        controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({ error: message })}\n\n`
-          )
-        );
+        const message = error instanceof Error ? error.message : "Unknown error";
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: message })}\n\n`));
         controller.close();
       }
     },
