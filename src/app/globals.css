@@ -2,6 +2,7 @@
 
 :root {
   --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
 }
 
 body {
@@ -12,7 +13,8 @@ body {
 .tiptap {
   outline: none;
   min-height: calc(100vh - 8rem);
-  font-size: 1rem;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
   line-height: 1.75;
   color: #1a1a1a;
 }
