@@ -1,0 +1,200 @@
+CHAPTER 5
+Burn the Ships
+
+My father had liked to joke that I was the slow one. He'd say it sort of lovingly, his hand on my shoulder. This was the same guy who would take me camping and tell me about the origins of everything, but the constant jokes of being switched at birth and then the way he just upped and walked out on my mother left me with something to prove.
+
+Back in San Diego, I found myself in the last half of a PhD program that felt a million miles away from the person I had been on the road. The coursework drew me back to the esoteric, material science at the quantum level where matter behaves as two things at once, particle and wave, and where two of them on opposite sides of the universe seem to know what the other is doing. My professors would do their best to describe the strangeness mathematically, but nobody could really explain why that happened. I liked that they admitted not everything had been figured out.
+
+Years earlier I had spotted an old aquarium chiller in the corner of Meyers's lab. It looked like something rescued from a pet store closing sale. He told me he'd once dreamed of growing seashells in tanks to study how nature engineers things so strong. Within a week I had a junky hobby aquarium bubbling away, rigged with that chiller and whatever plumbing I could scavenge. The organisms grew too slowly to see. What I could see was that they were hungry. They ate seaweed, and a lot of it. Suddenly I was the oddball carting buckets of kelp from the beach up through the engineering building, past offices of people designing microprocessors and satellite systems, trailing saltwater and bits of marine algae across the linoleum.
+
+It was a sea shell that changed how I thought of the invisible.
+
+Under the scanning electron microscope, a giant device of vacuum chambers and heavy metal, I saw an entire world, a city in miniature. Tiny stacks of hexagonal tiles arranged like pine trees growing upward. Each tile less than half a micron thick, thousands of times smaller than a grain of sand. They were forming in the narrow space between the abalone's body and its shell, where temperature and chemistry were exactly right for self-assembly. No fancy kiln or furnace or tiny hands laying the bricks. Just seawater and biology and time, producing an architecture orders of magnitude stronger than the calcium carbonate it was made from.
+
+Then I noticed the bands. Between those tiny hexagonal tiles were regular markings, like rings of a tree. They corresponded to cycles. As I studied them more closely, I began to suspect they were recording the moon's influence on their growth. At the nanoscale, inside a shell in an aquarium in a San Diego engineering lab, was a record of the oscillations of celestial bodies.
+
+My father had looked through a telescope and wondered how the universe assembled itself from its origins. I was looking through a microscope and watching a shell assemble in the same wonder.
+
+---
+
+But between classes and schlepping seaweed through campus, all that I had seen on my travels, and in particular what Amaraa had shown me on the steppe, wouldn't let go. I found the *Secret History of the Mongols*, a document written within a year or two of the Khan's death. It read like a series of poems, and had disappeared and resurfaced in phonetic translations across centuries, only to be fully deciphered in the twentieth century. In its pages was the story Amaraa had told me, but with more details. For me it was all new. The version the West knew had been written by his enemies, fear tactics from his campaigns calcified into history. This was the story from within. My whole life I had made brass rubbings of other people's legends. It felt good to be pressing the canvas in search of my own.
+
+Then one day, I read a poster that had been taped to the elevator wall for a lecture. Maurizio Seracini was using bioengineering techniques to search for lost Italian Renaissance art in impossible places. He'd found forgotten documents that implied one of Leonardo da Vinci's lost masterpieces, a massive mural called *The Battle of Anghiari*, had been hidden behind a false wall rather than destroyed as politics shifted. Using thermal and gamma ray imaging to look through the walls, he was searching without touching or disturbing the painting. I sat in the back row, stunned.
+
+My mind raced to the missing tomb. I had read that the clues in the historical records described a vast, inaccessible wilderness as a potential location, on a sacred mountain at the heart of his story. But no one really knew. And because it was still Genghis Khan's eternal spiritual home, even if you found it, digging into it would be strictly forbidden. How do you find a needle in a haystack when touching the haystack risks its existence?
+
+Maurizio was doing it for a painting. If he could see through a wall, and my microscope could see through a shell, maybe there were tools that could see through pine trees or into a sacred mountain. Satellite imaging? Radar? "Sounds ridiculous," I scolded myself. But the inklings of a plan threatened to form.
+
+---
+
+Beyond the dreaming, real life was closing in. I watched friends graduate and find work at companies like Intel or Google, buy new cars. That was what I was supposed to do.
+
+Then my appendix ruptured. The unglamorous truth is that I was extremely constipated for weeks, spending so much time on the toilet that my butt started to get bruises and my roommates grew impatient. At least I had a lot of time to read. When I finally keeled over in pain, my friends took me to the ER. My appendix had pinned my intestines together. I was literally full of shit, finally fully owning that childhood name xiao poo my family had given me to the point of bursting. They rushed me into surgery.
+
+The day after the operation I boarded a plane to deliver my final research talk at the annual international materials science conference in Florida, the place most graduating PhD students look for jobs. During a layover in Las Vegas I looked down and saw blood pouring through my shirt. The stitches had broken. A horrified airline steward radioed for a wheelchair and put me on a flight home. Later I learned early explorers used to remove their appendixes to avoid catastrophe in the field. It seemed that mine had ruptured on cue, fate knocking me off the "expected" path.
+
+When a lab mate returned from the conference and asked how I was doing, his excitement about a university teaching position interview he'd been offered only sharpened my unease. He could see my distress.
+
+"If you didn't consider the issue of money," he asked, "what would you do with your life?"
+
+I thought back to the road, to Maya, to Amaraa, to the parallel life of the explorer I had been during those summers. I thought about my father's words "follow your passion and let the money figure itself out." My guts had literally closed the door on the other option. But I couldn't just wander forever. I had to find the point to my wandering.
+
+"I would actually... launch this expedition to find Genghis Khan's tomb."
+
+I half expected him to laugh. He didn't. That was the first time I had really said it out loud. My guts just had to be cleared.
+
+---
+
+Nothing big happens alone. I had been training myself to believe in the audacious for years, on those solo trips into the world, but also on rocks with my friends. To attempt something this absurd, these were the only people nutty enough to try it with me.
+
+My core crew was an eclectic group of rock-climbing engineering PhD students. They were each skilled in different technical ways, and all of them climbed mountains for fun. Over the years, between classes, we had tested and trusted each other in increasingly difficult situations, and we all climbed hard. Shay was the rowdy one. He once climbed a hundred-and-fifty-foot route in neon tights and roller skates. Nate would already be starting up a route while everyone else was still discussing it. Kostas was the humble one, who devastatingly called bullshit on anyone with an oversized ego.
+
+Some weren't students at all. Charles was a geologist, the most rugged of us, someone who had grown up pulling arrowheads out of tree roots. Gil Weiss lived untamed, a climber with a poet's mind and one of my closest friends in those years. "Peaks are the ultimate metaphor for life," he'd say. "A place to find truth in each other." I loved him for that.
+
+Our favorite rocks were in Joshua Tree, endless fields of jumbled boulders and cracks that spread across the desert like a surrealist climber's playground. Then there were the big climbs of the Eastern Sierras and the classic walls of Yosemite. We slept on portaledges bolted to cliff faces, hauled gear up sheer granite, shared spaces so small and exposed you couldn't hide *anything* from each other. Weekend after weekend of putting our lives in each other's hands, until there was no pretense left. These would be the subtle skills of mindset that would help us in the years to come.
+
+Every challenge was just another problem to solve, another peak to climb. And when a problem got bad enough that solving stopped working, we'd make a song about it in defiance. Climbing had taught us to believe in the audacious. The PhD programs had taught us that discovery was something a person could actually do. Between them, a lost tomb did not seem out of range.
+
+---
+
+The week after I defended my thesis, there was one more thing to do before I began the search. As a boy I had stood on the Yosemite valley floor watching climbers move like ants across the iconic nose of El Capitan, and promised myself I would come back. Shay agreed to join me. Four days on three thousand feet of granite. The Sierra summers with Gordo, the climbing trips each weekend, the slow accumulation of trust and knowledge had led us to that wall.
+
+Within thirty minutes we were hundreds of feet up. Rappelling down was no longer an option. The only way out was up. We could see the parked cars in the valley below and hear the conversations of tourists amplified off the granite. That was me once.
+
+Our hands were bloodied, our fingers worn to nothing. Shay relieved himself in a bag while tourists watched through telescopes. I played a ukulele song about it. We climbed through scorching sun and into the night by headlamp. In the darkness tiny frogs emerged from the cracks, drawn out by the midnight dew.
+
+On the third day Shay was leading us through a pitch known as Changing Corners, where you move from a millimeter-wide crack across a sharp edge to another crack, bit by bit. I was belaying below, out of sight, when I heard the scariest sound in climbing: PingPingPingPing, the sound of pieces ripping out of the wall one after another, like a seam coming undone. The line went taut on a few pieces above the anchor and slammed me into the rock. I saw the rope grinding over the sharp edge, the nylon sheath fraying. Then Shay swung into view, upside down and terrified. His last two pieces had held. He righted himself, tried to get back on, but his focus was gone.
+
+"Albert, sing something," he said.
+
+I sang. He climbed. When he made it up I rolled him a cigarette, followed up the line, cleaned the gear, and handed it to him at the top. He was still shaking. The rope sheath was frayed but we didn't have another option, and kept going.
+
+When I pulled myself over the top edge onto flat ground, I started crying. Not from exhaustion alone. I'd been a formal student for almost my entire life, since the days I had looked up at this impossible cliff as a boy. That climb was the metamorphosis, the culmination of one version of me to begin another.
+
+Shay looked at me and said, casually, "What's next?" He and I sat on the edge with our legs dangling over the void, the valley spilling out beneath us, raised and formed of millions of years of time and pressure. The next mountain had already been calling, but it was on the other side of the world.
+
+---
+
+"One year," that's what I gave myself as I started to mold a plan out of thin air. Everyone who would listen heard about the project. "We're going to locate the tomb of Genghis Khan." It sounded like a child saying he'd be an astronaut. But someone *does* become that astronaut. So I kept saying it, until I almost believed it. Most were supportive, some were skeptical. My mom, not quite understanding what I was proposing, simply advised "that's nice, be humble."
+
+It was 2008, the economy had just tanked. I had no job, no income, no home, and no credibility for what I said I was going to do, but then again who would. So I "burned the ships," metaphorically, like a conquistador who was committing his soldiers to war by creating no chance of retreat. Commitment was the whole point, just go all in and figure it out. I needed cash and no bills to give myself time to take my shot, so I sold nearly everything but my guitar and some clothes and moved into the back of my red Mazda hatchback.
+
+I pushed my few remaining belongings to the side, laid the back seats flat, and built myself a home on wheels. I'd lie down in the back and read *Master and Commander*, tales of a scientist-surgeon and a captain heading for any horizon in the great age of sail. Then I'd turn my headlamp off and drift into sleep as condensation from my breath gathered on the windowsill.
+
+At first I thought it would be romantic, like some outlaw poet, but the romance wore thin fast. Every night was a hunt for somewhere to park without being ticketed or towed. Finding the basics became a challenge: water, a place to charge things, a bathroom, a shower. In a city manicured like a lawn, I was a weed. But two things kept me going. A three year project timeline that had been dreamed up and taped to my car window, and my friends. Satellites, drones, then ground penetrating radar. I would hone in from above, never moving a stone. Each night before sleep that map of the future was the last thing I saw, each morning the first.
+
+Friends lent me graduate dorm parking passes and couches and would let me take showers in their apartments from time to time. Derek would hang a fake sign reading "Sleep Study in Progress" on a conference room door so I could nap. And each day I'd find my way back to campus where I still had a library card, a key into the entirety of the UC collection of rare books that included ancient manuscripts from Asia that I couldn't understand. Still I devoured whatever I could get my hands on. At my freshman orientation they told me to find balance, now I was balancing between belief, hubris, and disaster at all times.
+
+I made scrounging for food into an art form, literally. The campus salad bar charged by the bowl, so I'd engineer towering masterpieces in the cafeteria. Carrots laid horizontally as scaffolding, cucumbers as buttresses, then as many hardboiled eggs as I could pile on top for the protein, the piece would grow so high it looked like a mini skyscraper. The cashiers were amused at first. I'd smile and hand them my dollar fifty. It worked until they changed the policy, in honor of me, to charge by the ounce. I hit every free dinner at every student club that would have me, and my friends did too on my behalf, always getting double portions to share with me.
+
+The institute where I'd heard Seracini's lecture gave me squatting rights at a small desk wedged amongst the administrative staff. It wasn't much but it was a start, a desk. That cubicle became my command post. Towers of history books rose higher each week. The accountants around me watched, at first amused, then perplexed. That was becoming a trend. A framed poster of Genghis Khan appeared over the piles like a flag planted in foreign ground.
+
+Kostas began helping me with the historical search. We would spread photocopied pages across the desk, chasing fragments of a trail that traversed centuries. It felt like we were ancient detectives. Friends in the graduate community translated ancient Arabic texts for us. Chinese chroniclers, Persian historians, and Mongolian sources had been translated by a Frenchman years ago, and they all told different stories. But they agreed that the burial site had been hidden, and that it was likely on a sacred mountain in a sprawling, untamed range on the Mongolian-Russian border. Kostas looked up from the papers. "We need to go there." Then Nate would stop by to drop off a free burrito or slice of pizza he'd found for me.
+
+Of course there were moments of doubt, what the hell was I doing? One morning, after sleeping on Shay and Nate's couch, I blurted, "I just want a fucking closet!" Without a word, they emptied theirs and pointed at the bare shelves. "There! Your closet!" Then they sat down and helped me hack together a project website using open-source tools because we couldn't afford any software. That was the kind of friendship that kept the ember alive.
+
+Underneath it all, in the long hours when I couldn't sleep, I wondered if I was throwing my future away. Everyone I knew was building careers. I was living in a parking lot. But then I'd look at the timeline on the window and think, maybe the tomb had stayed hidden precisely because no one had been crazy enough to seriously try. And maybe we were the right ones to do it.
+
+Nate never doubted, even when I doubted myself. He went after ground penetrating radar and magnetometry. Shay had played devil's advocate until I told him I needed him to believe it or leave, the way we had on the big walls. That shifted something, like a ship clearing seaweed from its keel. Soon he was deep in multi-spectral satellite imaging, hunting for what the eye can't see from above. With them, Kostas, and a few others, we started calling ourselves the Valley of the Khans Project. A high-tech, non-invasive search. And if we found Genghis Khan, who's to say his imperial family wouldn't be there too? We even made a ridiculous anthem on my ukulele:
+
+"He wants to fiiiiind... the lost tommmmb... of Genghis Khaaaaan... using geo-phy-si-cal techniques!"
+
+It was our own Mission Impossible, run on bootstrapped resources and a big, foolish innocence that was our secret superpower. More joined. An undergraduate built drone prototypes out of scrap, years before anyone used the word for anything outside science fiction. A Spaniard signed on as geophysicist for the price of a flight. Each had somehow convinced a "real job" to let them go. There was no money, but we were starting to look like an expedition team anyway.
+
+In reality it was all an imaginary quest. Until it wasn't.
+
+A university writer did a short story on the project out of sympathy, which miraculously snowballed into coverage from the Union-Tribune and NBC. The news kept growing. It was a catchy headline: University Researcher Planning a High-Tech Search for Genghis Khan's Tomb. One morning, riding on Nate's handlebars in a dress shirt because I couldn't afford a parking pass, my phone buzzed. "This is Mark Brender from the GeoEye Foundation. I just read the article about your project, we want to support you. Just tell us where to point the satellites." We whooped in the middle of a construction site like lunatics. I was commanding satellites in orbit from the handlebars of a borrowed bike. The construction workers ignored us.
+
+Then came the glorious golden card. I'd stitched every token of the project's legitimacy into a binder I carried everywhere: GeoEye and UCSD logos, letters on letterhead, the project plan. When I learned that Maurizio would be hosting a campus tour for Terry Garcia, the Executive Vice President of National Geographic, I snuck into his office, found the itinerary, and set the ambush. At the exact minute their route cut through the student center courtyard, I stepped out of a stream of board shorts and hoodies, wearing the one button-up shirt and suit I owned, and delivered the most important elevator pitch of my life.
+
+Terry listened, flipped through the binder half distracted by an inbound call, placed a card into my hand, and said, "Follow up," with a smile. Then they walked off.
+
+I stood in that courtyard and stared at that little paper rectangle as if it was the key to my entire future. When I brought it back to Nate and Shay we danced around it like morons. The administrative staff at the cubicle watched with more confused stares. "You better write to that guy every fucking day!" Nate proclaimed. We settled on weekly updates. No response, but the emails never bounced back either.
+
+With all the momentum of the satellites and the first conversations with National Geographic, it was past time to go back to Mongolia and see if I could build the relationship and find the partners I would need to actually do this search. I began pooling the last of my resources and got a ticket to head back to Ulaanbaatar, but it was nearly winter now and much colder.
+
+---
+
+Around that time I met Kara. She worked at a research lab studying virtual reality on campus, had a real job, and stood out in the sea of engineers that surrounded her. One morning I found a way to talk to her in a hallway the way I'd ambushed Terry Garcia, only with less preparation and more stammering. She saw right through me but laughed, and that was enough to get a coffee. I told her, "We should collaborate." She looked at me with a smirk and said, "What does that mean?" Her face had the composure of a duchess, but she wanted to go rock climbing and camping with me in the desert. I was living in my car with a poster of Genghis Khan taped to the wall of a borrowed cubicle, and she didn't seem to mind. She was as kind and sharp as she was beautiful, and when she met me at the crux of my dreaming, her blind positivity that anything was possible was exactly what I needed.
+
+---
+
+Finally a response from Terry. A request to stop flooding his inbox, paired with an offered date for the presentation in DC, two days after I was set to be the best man at Derek's wedding. Derek and his fiancée were expecting a baby, and I was to be godfather. I'd do it all in one trip: rural Ohio for the ceremony, DC for Nat Geo, then straight to Mongolia.
+
+It was snowing when I arrived in Ohio. Derek's dad Bob, an eccentric giant of a man who'd made his fortune in land prospecting, met me at the airport. On the drive to their home I told him about the search. Later, between toasts for the bride and groom, he pulled me into his office and pored over my maps, his hand shaking up and down violently. "Dowsing!" he said emphatically. Then: "Before you go, you will catch a fish!"
+
+It turned out Derek, who I had only known as a poor art student, actually came from an old line of ship builders. His mother's family had run the Shiverick Shipyard in Cape Cod, the only yard there ever to launch the great clippers, sleek three-masted ships that raced tea and silk home from China and Hong Kong in the Golden Age of Sail. Naturally, I took that as a mandate to spend the reception spouting passages of *Master and Commander* in my best captain's voice, booming raucous declarations of the adventure and honor that lay ahead for the newlyweds in their nascent marriage. The night was a party of Gatsby proportions, banjos in tuxedos, turkey legs at three in the morning. Amidst the revelry, the world outside had become a full-blown blizzard. By the next morning, hungover on champagne and speeches, I was dragged by Bob to the river without pity. I had a flight to catch and it seemed insane, but he was the boss. The wind yanked at my fly rod. I cast into the white void, the fly smacking uselessly against the freezing current. Bob kept yelling through the wind, "There's a fish out there! I can feel it!"
+
+And as my frozen hands whipped back and forth the line suddenly went taut. Trembling, I reeled in a monster of a trout. I hadn't really caught it. The wind had dragged my hook into its fin completely by chance. But whether or not I believed in dowsing, it was a good omen. I hugged Derek, and left for the airport still stinking of fish guts.
+
+---
+
+The next morning, in a dingy roach-infested hotel, I put on my only suit and walked past the monuments of the Capitol toward National Geographic headquarters. Fred Hiebert, its archaeology fellow, met me in the lobby under a giant seal of the Society's emblem. He scanned me in with a badge and before I could get my bearings we were passing the offices of legends. Sylvia Earle, amongst the first female deep-sea pioneers. Bob Ballard, who'd found the *Titanic*. I felt like a kid in the locker room of a Major League Baseball team.
+
+Fred took me to a small room where about fifteen people with notepads trickled in. The communications director gave an unflattering introduction that amounted to "we have no idea who this guy is."
+
+The seats were half full, everyone looking at me. Everything I had was in the binder in my hands. I stood up and started talking. The story of my journey through the steppe with Amaraa, the *Secret History*, the sacred mountain, and the technology that could look without touching. "I'm flying to Mongolia tomorrow to establish permissions to enter the forbidden zone." I ended with a subtle plea for support.
+
+When the room emptied, Fred turned to me. "You know what you really need? A 'dazzler'." Moments later he crafted a vaguely supportive letter, slapped a golden Nat Geo seal sticker on it, and just like that, my binder felt like Excalibur.
+
+That evening I received an unexpected invitation to the home of Tim Kelly, President of National Geographic Global Media. Stunned, I sat in his living room, surrounded by mementos and photographs from expeditions that had changed the way people understood the world.
+
+"I was in the back of the room today, it's an interesting project," he said with a soft-spoken authority. This man would become a mentor to me over many years.
+
+We spoke for a while, Tim's wife Susan offered me a glass of wine. "One day, you'll write a book about this," she said. I laughed.
+
+As the sunset we migrated to the rooftop. Then across the treetops of Rock Creek Park a lion's roar washed over us. The distance between my actual life and the life unfolding around me had become so vast I could barely process it. I kept waiting for someone to realize I was just a kid who lived in his car. My crew's motto "fake it till you make it" rang in my ears.
+
+---
+
+Two days later I was looking out of a plane window over Ulaanbaatar, forced into a holding pattern while prevailing winds pushed the smog from the intense charcoal factory stacks that powered much of the city. My dazzler-empowered binder, a borrowed winter suit and suitcase, and whatever was left of my savings were all I had. It was minus twenty degrees when I walked through the airport doors and the cold hit me in the face with a punch.
+
+Suddenly I was with Amaraa and Bibi again, only this time it was winter and my purpose for being there had evolved significantly. Bibi was still heading the country's largest news organization, and had since fallen in love and married.
+
+"Non-invasive is good," she said. "But even looking is controversial here. There are specific people you will need to talk to first. You can present your binder and see what they say. The foreign office, the minister of culture, members of Parliament." She paused. "This is going to be very political."
+
+The next day Bibi's husband Baika, the well educated son of a historian, introduced me to his father's old friend Professor Bira, an elder statesman of Mongolian history. The two of them belonged to the same generation, the men who had risked their lives preserving their history during the Soviet occupation. At his side was Ishdorj, younger and quieter, but someone who had also dedicated his career to the same fight. For decades, Mongolia's history had been suppressed, its greatest figure erased from its own textbooks. At that time, speaking the name of Genghis Khan could get you killed. The tomb wasn't just an archaeological question to them. It was the keystone of their cultural identity, all the while other nations kept claiming it as their own.
+
+Over a cold-cut lunch near a square with statues of Genghis Khan and Lenin, I showed them everything I had researched about technologies we could use. They were cautious but intrigued, not so much by the binder but by what it said about the approach. No excavation. If we could get these tools we could look into the ground without moving a stone. "No disturbing the tomb, but still possibly finding it," I told them. If the search was going to happen, Mongolian scholars would need to be the ones that led it with me.
+
+Within a week, through a chain of introductions that moved faster than I could follow, I was walking through the large marble atrium of the Mongolian equivalent to the White House and past a large staff with white horse hair adorning a spear's tip. "The Sulde, it is a Soul banner," Baika had told me. A few hours later, in disbelief, I held a letter of carefully worded support. I sent a copy to Fred at National Geographic.
+
+---
+
+It was a monumental step, but also just a piece of paper. Before I could return, I needed to get the GPS coordinates for the satellite image collection. Even if I could just get to the edge of the mysterious Ikh Khorig that would be enough. I asked Amaraa if he would take me north, and he gathered a small group of friends. Two old four-by-fours loaded with water, food, prayer flags, guns, and bullets. As we pulled out of Ulaanbaatar his mother threw cups of milk into the sky for the journey as she had once before.
+
+I assumed we'd head straight north. Instead we drove east, then further east. By midday the city was hours behind us and we were still bearing the wrong way.
+
+"First we climb the Shiliin Bogd," Amaraa said. "A holy place. To find out if you really have permission."
+
+Mongolia is a place of Tengrism, a shamanic system older than Genghis Khan. Mother Earth and Father Sky, and human beings as the children caught between them. Trees and rivers and mountains are the temples, connections between the dual forces of the cosmos. It wasn't a metaphor for my friends.
+
+In a small village we picked up more prayer flags and fermented horse milk. Then continued over frozen roads of mud and ice. Along the road his friends hunted a gazelle, taken from the same open plains that had fed nomads for thousands of years. That night, at a traveler's yurt camp at the base of sacred Shiliin Bogd, we cut it up, boiled it, and ate it together before falling asleep in our felt door tents.
+
+I rose in the blue hour before dawn. Forty degrees below zero. At that temperature Celsius and Fahrenheit stop mattering. Even through my leather winter hat my ears burned with the cold. We climbed into the wind without speaking. As the sun crested the horizon we cheered to the mountain three times, arms raised, *Ocharo* called out to the gods.
+
+That's when the eagles came. Three or four of them, sliding above us on the cold wind. Then one broke from the rest and hovered for a long moment over our shoulders.
+
+Amaraa was beaming. "You see, NaChing, the eagle."
+
+For him, that was the permission that mattered most. The older kind, the kind no ministry can grant.
+
+The next day we pushed north toward the edge of the destination I had been visualizing for so long. The roads thinned and then stopped being roads. Snow lay deep across the last valley and the four-by-fours could not hold the grade. That was as far as we could go.
+
+In the distance the range rose out of the white, one line of peaks behind another, and somewhere among them the mountain at the heart of the whole story. I got my GPS out with shivering hands and recorded where we stood. There was no frustration at the limit, only awe. Years of dreaming this from the back of my car, and now it was in front of me.
+
+Next to an icy river, we made camp. That night we huddled around a fire in the bitter cold, eating the leftovers from the gazelle with our hands. Amaraa and his friends began singing softly and telling stories about their families. There on that river, at the edge of a place that had been sealed for eight hundred years, I had slipped through time.
+
+On the plane back to San Diego I found myself, once again, in disbelief. But when I landed I went to pick up my car which had been my home and it wasn't there. Towed six days earlier, unnoticed by my friend who had agreed to watch it for me. Everything I owned, impounded. I tracked it to a tow yard and used the very last of my savings to get it back. That night I cried myself to sleep in my car, writing in my journal.
+
+"I am so close, but now it feels so far. I am broke."
+
+The GPS coordinates sat in a device on the passenger seat, I did not even have a dollar left to buy a burger.
+
+Literally the next day, a message from Fred. "Great news! Nat Geo wants to sponsor you. You've been approved for a fifteen-thousand-dollar exploratory grant."
+
+I sat bewildered, and stared at the message.
+
+I had the permissions. I had the grant. I had a team of friends who believed. And I had seen the sacred mountain with my own eyes. It seemed like something had actually emerged from nothing and the quest was about to begin. I just couldn't have known that it would begin with the words, "Guys, we're fucked."
+
+---

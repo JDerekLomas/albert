@@ -1,0 +1,214 @@
+CHAPTER 10
+Ground Truth
+
+I packed a tent, headlamp, machete, a photo of my kids, and a good luck token that Millie had made me, but now there were spare leg parts too. Hex wrenches, chemically activated ice packs, walking sticks, and some anxiety. I genuinely didn't know if my new body could handle the jungle, so different from the accessibility-oriented world I was still learning to navigate at home. It was all so new that I hadn't even made it to a single formal physical therapy session. Scariest of all, I now depended on a new piece of hardware to exist. At home I could get something fixed or adjusted in a clinic twenty minutes away, but what if it broke out there? I'd be stranded deep in the wilderness of the Maya jungle without the ability to walk. Yet under that canopy of doubt, the explorer in me was excited to be moving forward, back in the field chasing whatever the lasers had found beneath the trees, and in turn whatever those lasers would find within me.
+
+Eight months had passed since the amputation.
+
+Tom Garrison's LiDAR consortium had cracked open the Maya world. A few months earlier, at that fire in Death Valley, he had told me the history of archaeology would be split between the time before LiDAR and the time after. He described this a day after I dissolved a phantom limb with mushrooms whose lineage ran back to the same Mesoamerican ground I was now heading into.
+
+He and a handful of colleagues and powerful funders had created the PACUNAM LiDAR Initiative and commissioned a plane over the Petén, the jungle heart of a civilization whose cities had once spread across what is now Belize, Mexico, and Guatemala. Range-finding lasers fired down through the canopy.
+
+What came back was a sea of suspicious rises in the terrain, pyramids and plazas, roads and entire cities, hidden under the trees for a thousand years. And as more data poured in, it replaced the jungle's rainy season with an anticipation.
+
+What was left was to walk in and ground truth it.
+
+And because I had already been into that jungle developing early ground and drone LiDAR approaches with Tom through my Engineers for Exploration program before the accident, National Geographic had thought of me as the thread to help tie the story of the initiative's many archaeological camps together for the public. I'm sure conversations about the unknowns of my post-amputation abilities happened behind the scenes, but ultimately they left the choice to me. I was grateful for that. But it was now or never.
+
+So that's how it came to be that I skipped PT for an expedition. Bruna would join me for support while the kids stayed with Kara, and barely out of crutches, still learning to trust my new form, I would carry whatever I had become into the jungle.
+
+---
+
+Bruna and I arrived in the Petén on a small fixed-wing prop plane. Tom picked us up in Flores and leveled with me.
+
+"Guys, were fucked. The Guatemalan archaeological community has held up everybody's permits. We're all in limbo."
+
+"Why does every expedition seem to start with this line?" I asked.
+
+No reply.
+
+Flores had become something like an Olympic Village of archaeologists. Intensely devoted scholars who'd spent careers in the jungle were now crammed into little hotels and bars, their machetes and trowels piled in bags while bureaucracy ground forward. It was like seeing a group of racehorses stuck at the gate, frustration and giddiness mixed into one.
+
+In a small bar that sat on the edge of the lake, Tom opened his laptop and showed us the map lasers had generated of a world long overgrown.
+
+"The trick is that a forest is mostly holes. The plane fires hundreds of thousands of pulses a second and nearly all of them hit a leaf and bounce straight back. But a few slip through the gaps all the way to the forest floor, and those take a fraction longer to return. Time every pulse, keep only the slowest ones, and you can delete the jungle and keep the ground," he explained, striking the keyboard.
+
+Large rectangular features that jumped right out of the technicolored topographical data, but also the subtle rises and falls of ancient lives, vast neighborhoods enclosed by what looked like a great wall. Even the faint outlines of farmed fields lingered under the veil of the forest that now covered it.
+
+"Wooooow," Bruna pressed in, looking at the fingerprints of a civilization in wonder.
+
+"It's like the hanging gardens of Babylon, but of the Maya," Tom said with amazement.
+
+Other archaeologists were scouring scans from their own sectors. They had walked right past so much of it.
+
+Then a legend of the discipline walked into the bar. Stephen Houston, Tom's old mentor. 
+
+"Hey guys, this holdup is rough, I am glad I am no longer the one who has to deal with it!" he said as he patted Tom on the shoulder with a mixture of pride and pity.
+
+For decades he, Stuart, and their colleagues had crawled through excavation tunnels decoding the enigmatic glyphs that covered the temple walls. What they somehow figured out were the meanings behind the swirling iconography, forgotten stories of real kings and queens, real wars, real dates. Events, thoughts, and beliefs of people who had been dead long ago, suddenly brought back into the collective consciousness.
+
+Short, stout, and crackling with energy, Steve stared at the screen with an air of awe. "The decoding of the language, and now this... truly the most remarkable moment in Maya archaeology," he said, almost to himself.
+
+But the hold up threatened the whole trip. Being part explorer, part divorced co-parent, meant that schedule ambiguity was a major liability.
+
+"We don't have to be so official. Why don't we go for a 'tourist hike'? No excavations, just a walk. It's a national park and open to the public," Steve said with a slightly lowered voice in a room full of pent-up archaeologists.
+
+I didn't need to be asked twice.
+
+Tom arranged a couple of Toyota Hilux trucks for his former mentor, along with a soft-spoken, formidable, machete-wielding Guatemalan crew boss named Don Antonio who had grown up in the jungle.
+
+"This is the real legend, he has stories of machete battles in his youth," Tom told me to the side, something I never would have guessed from his gentle demeanor. "He was also Ian Graham's crew boss," he continued with a reverence for the lineage of Maya archaeology itself, referencing an iconic pioneer of the field.
+
+Tom, who himself now carried the weight of leadership, stayed behind to deal with the bureaucrats. "You know the Maya word for bureaucrat is howler monkey, lots of noise but they don't really do much," he exclaimed in frustration.
+
+Then in the early morning stillness, on the edge of a calm lake that looked like a giant mirror, he sent us off.
+
+---
+
+Two trucks rambled along muddy roads strewn with fallen trees and ruts that rain had turned into formidable obstacles. To the birds above we must have looked like a pair of ants crawling under tall grass. We pushed deeper, and the air thickened as the jungle enveloped us. The earthy smell of life, merged with decay, seeped through the windows, allspice wafting through it. I worried about my leg. Would I hold up?
+
+Late in the afternoon we reached the Maya archaeological site of El Zotz, "The Bats," named for a giant bat cave that anchored it.
+
+"Caves were the doors to the spirit world," Tom had told me the first time I'd been here.
+
+At that point he was co-directing years of excavations there at the time with his Guatemalan counterparts, and the place had been bustling with an eclectic mix of his field-rugged archaeology students and my wide-eyed engineers. 
+
+It was now Bruna's eyes that were wide.
+
+We were alone now, with nothing but an abandoned hut in a clearing, surrounded by the primordial cry of howler monkeys, a helicopter pad for emergencies, and ghost cities of the Maya lurking all around us.
+
+We strung up our hammocks at the edge of the clearing, looking for trees not covered in ants. For a year Bruna had been with me at every hospital and every dune, folded into a life somewhere between stepmother to my kids and nurse to me. Here she stood and breathed in deep, wild and alive as the jungle itself.
+
+I watched her and wondered. Our love, the accident, the domesticated life she had landed into. Had I trapped her without meaning to? I pushed the thought aside.
+
+Night fell to an infinite set of stars, and just as many reflections of tiny eyes caught in the beam of our headlamps, a sea of spiders and other creatures in the fields surrounding us.
+
+I woke at dawn to the deafening cacophony of the jungle in its morning orchestra. Birds sang as monkeys howled, all dwarfed by a billion insects clicking and clacking away. Steve was already up, sitting in a chair on the helicopter pad poring over a stack of old site maps, trying to reconcile them with the world the LiDAR map was promising.
+
+I brought him coffee and asked what the glyphs said when they weren't recording kings and wars.
+
+"That's the good part." He set down the maps. "There's a sign we argued about for years. *Wahy*." He turned a page. "A co-essence. A companion self. Everybody has one, it isn't quite you, and it usually comes out at night."
+
+"Is it dangerous?"
+
+"Often. That's rather the point."
+
+I told him I'd had one of those, recounting how the phantom had woken me every night, screaming at me to tell me it was burning.
+
+Without much empathy, he responded, "They'd have had a word for that."
+
+"We're going to go twenty kilometers that way," he said, pointing into the wall of green. "And we'll see what we find."
+
+Twenty kilometers through untouched jungle. Even with two legs that would be a big day.
+
+Steve, misreading the look of concern I failed to conceal, tossed me a bottle of Gold Bond powder. "Great for the humidity. Put it on everything."
+
+"Here are your walking sticks, babe," Bruna said as she tossed her pack over her shoulder.
+
+We started down a side trail and almost immediately the forest undergrowth overtook us. The thick endless layers of trees, vines, and ferns made seeing anything more than a few hundred feet in any direction impossible. The suffocating lack of visibility made it obvious why so much of what the LiDAR map was promising had been missed, uniform walls of green to obscure mountains of archaeology and disorient anyone looking for them.
+
+GPS was useless without a clear view to the satellites. Steve pulled out a weathered compass that looked like he'd carried it since he was a student, and suddenly we were back to the basics.
+
+"I guess we're going to have to do this the old way," he said with a smile as I held the map created by lasers in the sky against his compass. We were down to dead reckoning, a process used by wayfinders to estimate where you are by tracking direction and distances from a known starting point.
+
+Don Antonio hacked away at the vegetation with a casual efficiency that made the jungle look easy while we followed in a single line to minimize the risks of accidentally stepping on a snake. He scanned the forest ahead the way Amaraa had the steppe, seeing things that my eyes missed.
+
+"The snakes would have a harder time with him," Don Antonio said to Steve in Spanish.
+
+"In the jungle, they say the third person in line is the one who gets killed. The first wakes the creatures up. The second scares them. The third gets bitten," Steve explained half teasingly. "It's a good thing you're third, it would be a rude awakening for a snake to find that!" he exclaimed, pointing at the exoskeleton of my socket.
+
+It was a legitimate advantage, but there were also challenges. The vines kept snagging the walking sticks and the curved carbon blade that was now my foot. I put away one of the poles and reached for my machete.
+
+"But more than the snakes, the most dangerous thing in the jungle is a gringo with a machete," Steve said over his shoulder. "The blade could bounce off a vine and catch you in the leg."
+
+"Another perk, I'll use it on this side," I reassured them, switching hands so the steel could only meet carbon fiber.
+
+We pushed on in the undergrowth, climbing over logs and fallen trees, rolling through so many spiders and scorpions that any squeamishness became pointless. I was vaguely aware that I was in pain, my stump swollen from the day. But the jungle has a way of narrowing focus to the next step. There was no room to feel sorry for myself because we were all in it, no room to feel anything except a commitment to move forward. I looked back at Bruna and asked her to help pull my water bottle from the side of my pack. "I am proud of you," she said quietly.
+
+Then Steve stopped. "This looks like an old looter's pit." Don Antonio peered into a decades-old trench where someone had once haphazardly dug for artifacts. At the bottom, he found a freshly shed coral snake skin. Coral snakes are aggressive and incredibly deadly. He climbed out fast.
+
+A few more hours of hacking and climbing our way through nature's web and we arrived at a small hillside and stopped to catch our breath.
+
+"My God." Steve's voice shifted. "See? You see the rise here? You see the rise there!"
+
+At first all I saw was overgrown moss, but with the LiDAR map he pointed to a large rectangular anomaly, then to a subtle rise in the ground in front of us. For a moment I could see what he saw. What looked like an innocuous tree-covered hill was actually the remnant of a building, buried for a thousand years beneath the jungle floor.
+
+He knelt and felt through the fallen decomposing leaves. Beneath were piles of limestone, organized like bricks one on top of another, marking the edge of a structure the LiDAR had promised was there. Then a fragment of pottery! Someone's story had taken place here, born from the jungle long, long ago. It felt like the first moment I had pulled a roof tile from within a tree root all those years ago in Mongolia, the "aha" moment that sent tingles up my spine.
+
+Don Antonio held the shard in his hand. He had seen the same many times before. "Classic period," he said, running his fingers over the ceramic.
+
+"Look, there's more up here!" Steve pointed up the topographical map. A steep cliff led to a mountaintop where the data showed more structures.
+
+The cliff face was slippery with moss and loose rock. A large fallen tree lay across our natural path, its trunk the size of a house. I grabbed vines as thick as arms, and pulled myself over. On the other side I walked the trunk like a balance beam, one real foot and one carbon foot picking their way across the bark. The jungle was forcing me to move the way it demanded, both walking sticks now tied to my pack as I ascended hand over hand with each step.
+
+We climbed a ridge line for a long time. With each step upwards the contractions of my heart and the muscles in my legs pumped oxygen-rich blood through my body, until finally we reached an outcropping of rocks and a window through the green.
+
+Suddenly a sweeping vista of forest fell away below. A single massive ceiba tree rose above the endless canopy, its towering magnificence a presence unto itself. The distant calls of howler monkeys echoed through the leaves as birds glided in and out of treetops. 
+
+The awe of nature in its full expression made me forget everything about my physical self, and I felt my mind merge into it with totality. 
+
+I realized the jungle alone was doing what all the rituals, entheogenic plants, and mirror therapy had been attempting in the months leading up to this. I didn't need those technologies, standing in nature alone could induce an altered state of consciousness through its overwhelming beauty.
+
+I looked at Bruna. "The jungle air is soooooo good!" she said with her hands on her knees as she caught her breath. "Everything okay with 'stumpy'?" she asked, pointing at my residual limb. I told her it was better than okay, that I felt free like the birds that soared overhead.
+
+At the top we found an enormous watchtower-like structure. The scans had worked.
+
+Looking down into the forest below it was impossible to see the rises and falls of the terrain we'd been climbing over all day. But once found, Steve could read the landscape like glyphs on a temple wall.
+
+The rest of the day was spent walking amongst the ghosts of a city long gone. Steve pointed at a mound and described it as a likely royal court because of its placement in the center, then a depression that he thought could be a reservoir engineered to capture rainwater for a city with no rivers. 
+
+He gestured at another rise while holding the LiDAR tablet in one hand like a surveyor of a construction site.
+
+"That looks like an 'E-group'! An observatory for the stars, the glyphs describe the Maya 'cosmovision' as tapped into the cycles of the seasons and the constellations," he explained.
+
+And then there was the wall. A structure so massive that archaeologists had always assumed it was geological, a natural ridge running through the forest. But the LiDAR had revealed its geometry, designed and built by human hands. It was Tikal's wall, raised across generations of war with neighboring city-states like the Kaanul, the Snake Kings, and others. From it we could see the ruins of a great capital poking out of the canopy in the distance.
+
+The glyphs Steve spent his career deciphering depicted many things, from their origin beliefs to conflicts so devastating they "crushed the stars." The causeways below had once carried armies. The watchtowers had once held sentinels. They fought each other, and then they starved. The great Classic cities emptied in the ninth century and the people scattered.
+
+I was struck by the image in my mind.
+
+A flame of consciousness rising out of that verdant canvas of life, gathering, discovering a connection to the cosmos and brightening until it turned on itself and burned out with the same heat that had made it. Then the jungle grew back over the embers until nothing remained to show it had ever been there. This duality seemed to be part of the human condition.
+
+But the Maya themselves never fully vanished.
+
+When Spanish conquistadors pushed into their world six hundred years later, millions still lived across the lowlands, and even though the magnificent limestone cities had long fallen back to the jungle, a handful of scribes could still read the glyphs.
+
+Tragically, the conquest set out to erase what was left. In 1562 a Spanish friar gathered the folding-bark codices he could find and burned them in a single fire, stating they were the "lies of the devil." Only four Maya books survived and the knowledge of how to read them died off.
+
+All that gathered wisdom, their cosmic visions and chronicled history, would not be pieced back together until the twentieth century when people like Steve found and decoded the carved stones of the lost cities, reading what had happened here.
+
+Don Antonio walked ahead of the group, past the ruins that were growing more obvious every time I looked. 
+
+---
+
+We spent one more night in the jungle using El Zotz as our base until Steve's student got dysentery, then packed up.
+
+I came out with a few sores and blisters. The bionic leg had held. Bruna was her usual positive self, but with the sea of bugs that greeted us each night I think she was happy to be heading back to Flores. But for me, it was just the beginning. That first return to the wilderness was all the physical and, more importantly, mental therapy I needed.
+
+By the time we got back to civilization, Tom's permits had come through. The consortium sprang alive: boots packed, jeeps loaded, machetes sharpened. The Olympic Village emptying into the forest. In the years that followed, Tom and his colleagues across their many dig sites would identify a staggering sixty thousand forgotten Maya structures.
+
+Sixty thousand newly identified pyramids, plazas, entire cities. Subtle irrigation fields and terraces ribbed across hillsides where archaeologists had assumed only jungle. The population estimates of the Maya at peak had increased by an order of magnitude. The New York Times headline read "Lasers Reveal a Maya Civilization So Dense It Blew Experts' Minds."
+
+National Geographic arranged the helicopters and during that time I would fly with a film crew from camp to camp across the Petén, documenting the discoveries as they unfolded. Old military pilots dropping in low, our tail rotor barely clearing the trees as we descended into small clearings cut into the endless forest. Before I put my prosthetic on each morning I was still completely disabled. But the moment I slid it on, I was an explorer on the run, volunteering more confidently each time to take the lead with my carbon fiber snake protection.
+
+Bruna didn't join me after that first "long walk in the forest" with Steve. The kids would go to their mom's and I would head back into the jungle. Each trip I would fly into a different part of the activity. When thunderstorms once stranded us for several days past my scheduled return, I had to call Kara on the satellite phone to explain I wouldn't be home in time to take the kids on our planned parenting schedule. To be honest, I'm not sure which was scarier, the deadly animals or the wrath of an angry co-parent. Other mornings I called home at first light and held the phone up to the canopy so Charlie and Millie could hear the howlers from a world away.
+
+"It's a T-Rex in the jungle, kiddies!" I would tell them as they listened in horror before seeing the tiny innocuous monkey come into view.
+
+One night at camp, drinking celebratory beers, Tom told me everyone gets a nickname from the Guatemalan crew. Unknowingly, mine had been El Robotico. "You don't get to choose your jungle name," he explained. A robot explorer following a map created by laser beams in the sky, hacking through a jungle full of lost cities. It felt pretty great for a guy who'd been a salvage piece in a hyperbaric chamber a half year earlier.
+
+I'd always strived to be a high-tech-enabled explorer. Now I was literally that.
+
+---
+
+One afternoon, near the end of that incredible season of discovery, my crew and I pulled into a small village on the outskirts of the jungle. We needed water, beer, and supplies. We must have looked like aliens descending on their world, our caravan of lifted trucks and large cameras rolling into a town of free-range chickens and a single wooden market by the side of the road.
+
+The moment I stepped out, eyes turned to my leg, more so than normal. Then my gaze landed on a man across the street.
+
+He was an amputee too. His leg taken by a snakebite. But unlike me, outfitted in elegant technology that let me walk again, he balanced on worn wooden crutches. Every movement done in disability. We looked at each other. I saw in his eyes that he was looking at my prosthetic the way I might look at something from another planet. He lived in this village, with these snakes, and this was what they'd cost him. There was no Peter Harsch here. No parallel bars. Just crutches, and the rest of his life on them.
+
+The pride I'd been carrying curdled instantly. I'd credited my community, grit, the jungle, the drive to reclaim myself. But the truth included something simpler and harder. I was enabled by a prosthetic that cost more than anyone in that village would earn in years. For me the snakes had become a punchline. For him they'd rewritten his life. The only thing separating us was the totally random accident of where we'd each been born.
+
+I went to him and tried to relate, but we were living universes apart. Eventually the team got back in the trucks and drove away. Nobody said anything. I sat and looked out the window for a long time, and the silence in the cab was different from the silence before we'd stopped.
+
+The man on crutches was me, in another room of reality.
