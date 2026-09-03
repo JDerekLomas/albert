@@ -71,8 +71,12 @@ function resolveSuggestions(html, keep /* "ins" | "del" */) {
     if (next === out) break;
     out = next;
   }
-  // A dropped span nested inside <em>/<strong> can leave the wrapper empty.
-  return out.replace(/<(em|strong|i|b)>\s*<\/\1>/g, "");
+  // Dropping a span can leave its wrapper empty. Rejecting a suggestion that
+  // added a whole paragraph leaves <p></p>; leaving those behind means the next
+  // suggestion run diffs against empty paragraphs and emits empty del spans.
+  out = out.replace(/<(em|strong|i|b)>\s*<\/\1>/g, "");
+  out = out.replace(/<(p|h[1-6]|blockquote|li)>\s*<\/\1>\s*/g, "");
+  return out;
 }
 
 const BLOCK = /<\/?(p|h[1-6]|div|blockquote|li|ul|ol|hr|br)\b[^>]*>/gi;

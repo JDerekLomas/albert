@@ -191,6 +191,54 @@ function wordOverlap(a, b) {
   return shared / Math.max(setA.size, setB.size);
 }
 
+/**
+ * Align two lists of blocks (paragraphs, or sentences) by similarity instead of
+ * by position, and return ops in document order.
+ *
+ * This exists because requiring `deleteRun.length === insertRun.length` — the
+ * old test — fails the moment a revision *adds* blocks next to ones it edits.
+ * Three edited paragraphs meeting five new ones would not pair at all, so each
+ * edited paragraph was deleted whole and re-inserted whole: a one-word change
+ * rendered as "delete 93 words, insert 93 words". Nobody can review that.
+ *
+ * Monotonic (no crossing) alignment maximising total overlap, so an edited
+ * block still pairs with its own descendant across inserted neighbours, and a
+ * genuinely new block stays a clean insertion.
+ */
+function alignByOverlap(oldItems, newItems, threshold = 0.35) {
+  const n = oldItems.length;
+  const m = newItems.length;
+  const sim = oldItems.map((o) => newItems.map((x) => wordOverlap(o, x)));
+  const scoreOf = (i, j) => (sim[i - 1][j - 1] >= threshold ? sim[i - 1][j - 1] : -Infinity);
+
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      const paired = scoreOf(i, j) === -Infinity ? -Infinity : dp[i - 1][j - 1] + scoreOf(i, j);
+      dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1], paired);
+    }
+  }
+
+  const ops = [];
+  let i = n;
+  let j = m;
+  while (i > 0 && j > 0) {
+    const paired = scoreOf(i, j) === -Infinity ? -Infinity : dp[i - 1][j - 1] + scoreOf(i, j);
+    if (dp[i][j] === paired) {
+      ops.push({ type: "pair", oldIdx: i - 1, newIdx: j - 1 });
+      i--;
+      j--;
+    } else if (dp[i][j] === dp[i - 1][j]) {
+      ops.push({ type: "del", oldIdx: --i });
+    } else {
+      ops.push({ type: "ins", newIdx: --j });
+    }
+  }
+  while (i > 0) ops.push({ type: "del", oldIdx: --i });
+  while (j > 0) ops.push({ type: "ins", newIdx: --j });
+  return ops.reverse();
+}
+
 function fineWordDiffSpans(oldText, newText, sid, reason, author) {
   const runs = tokenDiff(wordTokens(oldText), wordTokens(newText));
   let html = "";
@@ -237,14 +285,23 @@ function wordDiffHtml(oldText, newText, sid, reason, author) {
 
     if (run.type === "delete") {
       const next = runs[i + 1];
-      if (next && next.type === "insert" && next.items.length === run.items.length) {
-        for (let j = 0; j < run.items.length; j++) {
-          const a = run.items[j];
-          const b = next.items[j];
-          html +=
-            (wordOverlap(a, b) >= 0.5
-              ? fineWordDiffSpans(a, b, sid, reason, author)
-              : suggestionSpan("del", a, sid, reason, author) + suggestionSpan("ins", b, sid, reason, author)) + " ";
+      if (next && next.type === "insert") {
+        // Same alignment as at paragraph level: a lightly-edited sentence keeps
+        // a word-level diff even when a sentence was split or added next to it.
+        for (const op of alignByOverlap(run.items, next.items)) {
+          if (op.type === "pair") {
+            const a = run.items[op.oldIdx];
+            const b = next.items[op.newIdx];
+            html +=
+              (wordOverlap(a, b) >= 0.5
+                ? fineWordDiffSpans(a, b, sid, reason, author)
+                : suggestionSpan("del", a, sid, reason, author) +
+                  suggestionSpan("ins", b, sid, reason, author)) + " ";
+          } else if (op.type === "del") {
+            html += suggestionSpan("del", run.items[op.oldIdx], sid, reason, author) + " ";
+          } else {
+            html += suggestionSpan("ins", next.items[op.newIdx], sid, reason, author) + " ";
+          }
         }
         i++; // consume the paired insert run
         continue;
@@ -343,7 +400,9 @@ async function main() {
     ...b,
     origIndex,
   }));
-  const oldPBlocks = oldBlocks.filter((b) => b.tag === "p");
+  // Empty <p></p> can survive a rejected whole-paragraph insertion. Diffing
+  // against them produces empty del spans, so ignore them as prose anchors.
+  const oldPBlocks = oldBlocks.filter((b) => b.tag === "p" && b.text);
   const oldPTexts = oldPBlocks.map((b) => b.text);
 
   const runs = tokenDiff(oldPTexts, newParagraphs);
@@ -379,20 +438,32 @@ async function main() {
 
     if (run.type === "delete") {
       const next = runs[i + 1];
-      if (next && next.type === "insert" && next.items.length === run.items.length) {
-        // Paired paragraph edits — word-level diff, one suggestion per pair.
-        for (let j = 0; j < run.items.length; j++) {
-          const block = oldPBlocks[pPointer++];
+      if (next && next.type === "insert") {
+        // Align the two runs by similarity — an edited paragraph pairs with its
+        // own descendant (word-level diff) even when new paragraphs were added
+        // beside it; only genuinely new/removed paragraphs become whole blocks.
+        for (const op of alignByOverlap(run.items, next.items)) {
           const sid = nanoid(8);
           suggestionCount++;
-          const inner = wordDiffHtml(run.items[j], next.items[j], sid, reason, author);
-          anchoredHtml.set(block.origIndex, `<p>${inner}</p>`);
+          if (op.type === "ins") {
+            pushFloating(
+              `<p>${suggestionSpan("ins", next.items[op.newIdx], sid, reason, author)}</p>`
+            );
+            continue;
+          }
+          const block = oldPBlocks[pPointer++];
+          anchoredHtml.set(
+            block.origIndex,
+            op.type === "pair"
+              ? `<p>${wordDiffHtml(run.items[op.oldIdx], next.items[op.newIdx], sid, reason, author)}</p>`
+              : `<p>${suggestionSpan("del", run.items[op.oldIdx], sid, reason, author)}</p>`
+          );
           lastAnchoredOrigIndex = block.origIndex;
         }
         i++; // consume the paired insert run
         continue;
       }
-      // Unpaired deletions — whole-paragraph removal suggestions.
+      // Deletions with no insert run following — whole-paragraph removals.
       for (const text of run.items) {
         const block = oldPBlocks[pPointer++];
         const sid = nanoid(8);
