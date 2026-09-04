@@ -132,6 +132,28 @@ export function collectSuggestions(editor: {
 }
 
 /**
+ * All the text of one kind in a suggestion, in document order.
+ *
+ * One suggestion is routinely several spans — rewriting a sentence produces
+ * alternating del/ins runs around the words that survive. Taking only the
+ * first one (which both the panel and this log used to do) meant a five-span
+ * edit displayed as a single word pair: the reviewer saw "He → Ray" and
+ * clicked Accept on a rewrite of the whole sentence. In the log it was worse
+ * than cosmetic — the log exists so rejected prose stays recoverable, and it
+ * was keeping only the first fragment of it.
+ */
+export function suggestionText(suggestion: Suggestion, type: "del" | "ins") {
+  const text = [...suggestion.parts]
+    .sort((a, b) => a.from - b.from)
+    .filter((p) => p.type === type)
+    .map((p) => p.text)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || null;
+}
+
+/**
  * Once a suggestion is resolved, the losing text is gone from the live
  * document for good — reading it back means diffing version snapshots.
  * Logging every resolution here instead gives the Suggestions panel a
@@ -144,8 +166,8 @@ async function logResolution(
   suggestion: Suggestion,
   accept: boolean
 ) {
-  const del = suggestion.parts.find((p) => p.type === "del")?.text ?? null;
-  const ins = suggestion.parts.find((p) => p.type === "ins")?.text ?? null;
+  const del = suggestionText(suggestion, "del");
+  const ins = suggestionText(suggestion, "ins");
   const { error } = await supabase.from("albert_suggestion_log").insert({
     document_id: documentId,
     sid: suggestion.sid,

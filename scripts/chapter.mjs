@@ -37,7 +37,20 @@ import { resolve, join } from "path";
 import { execFileSync } from "child_process";
 
 const ROOT = resolve(import.meta.dirname, "..");
-const BOOK = "albert-lin-memoir";
+
+// --book lets the same loop drive the synthetic test book (sandbox-salt-line),
+// which is the only way to exercise a change to this script without spending
+// Albert's real prose on it. Pulled out of argv before the positional parse.
+const argv = process.argv.slice(2);
+let BOOK = "albert-lin-memoir";
+const bookFlag = argv.indexOf("--book");
+if (bookFlag !== -1) {
+  BOOK = argv[bookFlag + 1];
+  argv.splice(bookFlag, 2);
+}
+/** Only the memoir is mirrored in manuscript/. Other books live in the DB
+ *  alone, so the git-divergence machinery has nothing to compare against. */
+const TRACKED_IN_GIT = BOOK === "albert-lin-memoir";
 
 // ---- env ----------------------------------------------------------------
 for (const f of [".env.local", ".env"]) {
@@ -159,6 +172,7 @@ function corruption(html) {
 
 // ---- locating things ----------------------------------------------------
 function manuscriptPath(chapterNumber) {
+  if (!TRACKED_IN_GIT) return null;
   for (const part of [1, 2, 3, 4]) {
     const dir = join(ROOT, "manuscript", `part${part}`);
     if (!existsSync(dir)) continue;
@@ -203,7 +217,7 @@ async function writeDoc(doc, html, note) {
 }
 
 // ---- commands -----------------------------------------------------------
-const [cmd, target, ...rest] = process.argv.slice(2);
+const [cmd, target, ...rest] = argv;
 
 if (!cmd || !target) {
   console.log(readFileSync(import.meta.filename, "utf8").split("\n").slice(2, 30).join("\n").replace(/^ \* ?/gm, ""));

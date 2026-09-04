@@ -9,6 +9,7 @@ import {
   resolveSuggestion,
   ResolvedSuggestion,
   Suggestion,
+  suggestionText,
 } from "@/lib/suggestion-marks";
 
 export default function SuggestionsPanel({
@@ -63,13 +64,18 @@ export default function SuggestionsPanel({
     loadResolved();
   }
 
+  // Every span of the suggestion, not just the first — a card that shows one
+  // word pair for a five-span rewrite is asking for a click on something the
+  // reviewer hasn't seen.
   function snippet(s: Suggestion) {
-    const del = s.parts.find((p) => p.type === "del")?.text;
-    const ins = s.parts.find((p) => p.type === "ins")?.text;
-    if (del && ins) return { del, ins };
-    if (ins) return { del: null, ins };
-    return { del, ins: null };
+    return { del: suggestionText(s, "del"), ins: suggestionText(s, "ins") };
   }
+
+  // A reason shared by every pending suggestion belongs to the pass, not to
+  // any one edit. Two passes pending at once (different reasons) fall back to
+  // per-card display.
+  const reasons = new Set(suggestions.map((s) => s.reason).filter(Boolean));
+  const passReason = reasons.size === 1 && suggestions.length > 1 ? [...reasons][0] : null;
 
   function timeAgo(date: string) {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -100,6 +106,19 @@ export default function SuggestionsPanel({
           </svg>
         </button>
       </div>
+
+      {/* A `suggest` run stamps one reason across every change it made, so
+          repeating it on each card implied it explained THAT edit — a reviewer
+          reading "Continuity: Danny is nine" above an unrelated sentence
+          rewrite is being misled. Shown once, as what it is: the whole pass. */}
+      {passReason && (
+        <div className="px-3 py-2 border-b border-zinc-100 bg-zinc-50">
+          <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide mb-0.5">
+            This pass
+          </p>
+          <p className="text-xs text-zinc-500 italic leading-snug">{passReason}</p>
+        </div>
+      )}
 
       {suggestions.length > 0 && (
         <div className="px-3 py-2 border-b border-zinc-100 flex gap-2">
@@ -153,10 +172,8 @@ export default function SuggestionsPanel({
                   </div>
                 )}
               </div>
-              {s.reason && (
-                <p className="text-xs text-zinc-400 italic mb-2">
-                  {s.reason}
-                </p>
+              {s.reason && s.reason !== passReason && (
+                <p className="text-xs text-zinc-400 italic mb-2">{s.reason}</p>
               )}
               <div className="flex gap-2">
                 <button
