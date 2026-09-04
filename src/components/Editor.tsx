@@ -20,7 +20,12 @@ import ChapterIndexPanel from "./ChapterIndexPanel";
 import PassageHeatPanel from "./PassageHeatPanel";
 import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
 import { CommentHighlight } from "@/lib/comment-mark";
-import { PassageHeat, setPassageHeat, type Passage } from "@/lib/passage-heat";
+import {
+  PassageHeat,
+  setPassageHeat,
+  type ChapterVerdict,
+  type Passage,
+} from "@/lib/passage-heat";
 
 export default function Editor({ document: doc }: { document: Document }) {
   const [title, setTitle] = useState(doc.title);
@@ -44,6 +49,7 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [showOriginal, setShowOriginal] = useState(false);
   const [showHeat, setShowHeat] = useState(false);
   const [heat, setHeat] = useState<Passage[]>([]);
+  const [heatVerdict, setHeatVerdict] = useState<ChapterVerdict | null>(null);
   const [heatLoading, setHeatLoading] = useState(false);
   const [heatError, setHeatError] = useState<string | null>(null);
   const [heatFocused, setHeatFocused] = useState<number | null>(null);
@@ -145,6 +151,7 @@ export default function Editor({ document: doc }: { document: Document }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
       setHeat(data.passages || []);
+      setHeatVerdict(data.chapter || null);
       setShowHeat(true);
     } catch (e) {
       setHeatError(e instanceof Error ? e.message : "Assessment failed");
@@ -531,7 +538,10 @@ export default function Editor({ document: doc }: { document: Document }) {
                     showHeat ? "bg-white/20" : "bg-orange-500 text-white"
                   }`}
                 >
-                  {heat.filter((p) => p.score >= 0.5).length}
+                  {/* Findings only. An absolute score cutoff counted the
+                      author's own bracketed notes as problems, and moved as the
+                      model's calibration drifted. */}
+                  {heat.filter((p) => p.category !== "strong" && p.category !== "query").length}
                 </span>
               )}
             </button>
@@ -691,6 +701,7 @@ export default function Editor({ document: doc }: { document: Document }) {
         <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
           <PassageHeatPanel
             passages={heat}
+            verdict={heatVerdict}
             loading={heatLoading}
             error={heatError}
             onRun={runAssessment}

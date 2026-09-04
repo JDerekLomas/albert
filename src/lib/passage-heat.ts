@@ -19,6 +19,16 @@ export type Passage = {
   quote?: string;
 };
 
+/** The altitude above the paragraph. Some chapters don't have a paragraph
+ *  problem — they have a "this isn't written yet" problem, and no amount of
+ *  per-paragraph tint says that. */
+export type ChapterVerdict = {
+  state: "unwritten" | "sketch" | "draft" | "working" | "finished";
+  headline: string;
+  diagnosis: string;
+  next_action: string;
+};
+
 export const passageHeatKey = new PluginKey<PassageHeatState>("passageHeat");
 
 type PassageHeatState = {
@@ -31,26 +41,38 @@ type PassageHeatState = {
   includeStrong: boolean;
 };
 
-/** Category hue. Low-alpha fills so prose stays readable at any intensity. */
+/**
+ * Three hues, for three KINDS of thing — not seven, one per category.
+ *
+ * Colour used to encode the category, which put the least reliable field in the
+ * loudest channel: on a test fixture the model got the category wrong on a
+ * third of its correct findings, so a third of the page was confidently the
+ * wrong colour. What it is reliably right about is *that* a paragraph needs
+ * attention and roughly how much — so that is what the tint carries now, as
+ * intensity. The category is still shown, as a word, where being wrong is
+ * cheap and legible.
+ */
 const HUE: Record<string, string> = {
-  thin: "24 95% 53%", // orange — summarised where it should be dramatised
-  unclear: "0 84% 60%", // red — the reader cannot follow it
-  pacing: "271 81% 56%", // violet
-  continuity: "199 89% 48%", // blue — conflicts with another chapter
-  voice: "330 81% 60%", // pink — reads as explanation, not as Albert
-  query: "45 93% 47%", // amber — an open question for the author
+  attention: "24 95% 53%", // orange — needs work; intensity carries how much
+  query: "45 93% 47%", // amber — the author's own open question, not a finding
   strong: "160 84% 39%", // green — working; protect it
 };
 
+function hueFor(category: string) {
+  return HUE[category] ?? HUE.attention;
+}
+
 export function heatColor(category: string, score: number, alphaScale = 1) {
-  const hue = HUE[category] ?? HUE.unclear;
-  // "strong" is information, not a warning: keep it faint whatever its score.
-  const intensity = category === "strong" ? 0.1 : 0.08 + score * 0.34;
+  const hue = hueFor(category);
+  // "strong" and "query" are information, not severity: keep them flat and
+  // faint whatever the score, so intensity only ever means "needs work".
+  const intensity =
+    category === "strong" ? 0.1 : category === "query" ? 0.16 : 0.08 + score * 0.34;
   return `hsl(${hue} / ${(intensity * alphaScale).toFixed(3)})`;
 }
 
 export function heatBorder(category: string) {
-  return `hsl(${HUE[category] ?? HUE.unclear} / 0.85)`;
+  return `hsl(${hueFor(category)} / 0.85)`;
 }
 
 export const PassageHeat = Extension.create({

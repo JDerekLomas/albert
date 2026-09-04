@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { supabase, Book, Document } from "@/lib/supabase";
 import { nanoid } from "nanoid";
 import Link from "next/link";
+import ContinuityPanel from "@/components/ContinuityPanel";
 
 export default function BookPage() {
   const params = useParams();
@@ -129,6 +130,17 @@ export default function BookPage() {
           <span>{totalWords.toLocaleString()} words</span>
           <span>~{Math.ceil(totalWords / 250)} pages</span>
         </div>
+      )}
+
+      {/* Book-level, so it sits with the book — not inside a chapter, where it
+          could only ever see one chapter at a time. */}
+      {chapters.length > 1 && (
+        <ContinuityPanel
+          bookId={bookId}
+          chapterIds={Object.fromEntries(
+            chapters.filter((c) => c.chapter_number != null).map((c) => [c.chapter_number!, c.id])
+          )}
+        />
       )}
 
       {chapters.length > 0 && (
