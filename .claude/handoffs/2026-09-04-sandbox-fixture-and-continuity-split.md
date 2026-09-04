@@ -79,6 +79,48 @@ screenshot. Playwright + Chromium live in `~/sourcelibrary/node_modules`, and
 the *script* must live in that directory too — node resolves packages from the
 script's own path, not the cwd.
 
+## Act three: the human editor's loop
+
+Played end to end on sandbox Ch2. The AI editor proposed three edits drawn from
+the tool's own findings — Danny nine not eleven (continuity pass), cut the
+geology digression (heat map, pacing), name the referents in Ray's line (heat
+map, unclear). Clean diff shape, no churn warning: `+13w / -144w` across one
+deletion and two word-level edits.
+
+The human editor accepted the first two and **rejected the third**, because the
+AI had quietly invented an action — "and then he drove home without him" is not
+in the source. That is the failure mode `notes/workflow.md` warns about, and it
+happened on the very first pass written against this fixture. The rejected
+prose was restored byte-for-byte, apostrophe included.
+
+Three real bugs fell out of playing it, none visible by reading the code:
+
+1. **The review card showed only the first span of a suggestion.**
+   `collectSuggestions` returns a sentence rewrite as several alternating
+   del/ins runs, and both the card and the resolution log took `.find()` — the
+   first. A five-span rewrite rendered as `He → Ray` while the prose showed the
+   whole change. The reviewer was clicking Accept on something they had not
+   been shown.
+2. **The same truncation was in the resolved log**, which is worse than
+   cosmetic: that log exists so rejected prose stays recoverable, and the
+   rejected twelve-word rewrite was stored as `del: "He" / ins: "Ray"`.
+   Confirmed against the live table before fixing.
+3. **Accepting a whole-paragraph deletion left an empty `<p></p>`** — a blank
+   gap in the prose that can't be clicked into, and that the next suggest pass
+   then diffs against. The CLI path stripped these; the browser path did not, so
+   the same accept produced a different document depending on where you clicked.
+   Fixed by removing only the blocks that transaction emptied.
+
+Also fixed: the pass-level reason was printed on every card, so a reviewer
+reading "Continuity: Danny is nine in spring 1989" above an unrelated sentence
+rewrite was being misled about why that edit existed. Shown once now, as the
+pass.
+
+**Correction to the first half of this handoff:** suggestions *do* carry
+provenance — the card shows an author (`CLAUDE`) and the log stores it. What
+doesn't exist is any differentiated treatment: an AI's guess and a human
+editor's line edit look identical and review identically.
+
 ## Open, not resolved
 
 - **`import-book.mjs:119` deletes every row in `albert_documents`**, not just
@@ -92,12 +134,18 @@ script's own path, not the cwd.
   probably applies.
 - **The planted `unclear` defect is caught inconsistently** — labelled "thin" in
   two runs, correctly "unclear" (naming the unresolved "her") in a third.
-- **Suggestions still have no provenance.** In a three-party workflow, an edit
-  proposed by the AI and one proposed by a human editor are visually identical in
-  the panel, and plausibly deserve different defaults on review.
-- The scenario's third act was not played: nobody has run a `suggest` pass
-  against the sandbox and accepted/rejected it in the browser. The writer and AI
-  editor roles are exercised; the human editor's loop is not.
+- **Provenance exists but does nothing.** Author is recorded and displayed; an
+  AI's guess and a human editor's line edit still review identically. Whether
+  they should differ (default action, ordering, a "this one invented a detail"
+  check) is a design question, not a bug.
+- **Nothing checks a suggestion against the source before a human sees it.** The
+  invented "drove home without him" would have been caught by the rule already
+  written in `notes/workflow.md` — name the sentence each suggested line is
+  modelled on — but no code enforces it. A pre-flight pass that flags added
+  facts with no anchor in the chapter would have caught it before review.
+- The `--book` flag now works across `chapter.mjs`, `assess-chapter.mjs` and
+  `check-continuity.mjs`. `pull` and the git-divergence checks are memoir-only
+  by design (nothing else is mirrored in `manuscript/`).
 
 ## State
 
