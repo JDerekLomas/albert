@@ -60,6 +60,34 @@ GEMINI_API_KEY` from albert's own directory (never echo the value to a terminal 
 Re-run `summarize-chapter.mjs` for a chapter after any content change; re-run `reindex-book.mjs`
 after that.
 
+## Testing the editorial tooling — the sandbox book
+`sandbox/the-salt-line/` is a synthetic three-chapter memoir by a writer who does not exist,
+with **ten deliberately planted defects** and an answer key in `GROUND-TRUTH.md`. It exists
+because Albert's manuscript cannot measure the tool: there is no ground truth, so a plausible
+assessment is indistinguishable from a correct one, and every experiment spends his real prose.
+Use it whenever you change a prompt, a score, or the heat/continuity UI.
+```bash
+node scripts/seed-sandbox.mjs [--confirm] [--reset]     # book id sandbox-salt-line
+secret-lover run -- node scripts/assess-chapter.mjs --book sandbox-salt-line --all
+secret-lover run -- node scripts/check-continuity.mjs --book sandbox-salt-line [--ledger] [--passes N]
+```
+Live at https://albert-book.vercel.app/b/sandbox-salt-line. Two paragraphs are **false-positive
+traps** (a fragment-voice paragraph, a quiet paragraph doing quiet work) — flagging either means
+the tool has started scoring polish instead of need for work, which is the failure this repo
+cares about most.
+
+**Do NOT run `import-book.mjs` for the sandbox, or for any second book.** Line 119 deletes every
+row in `albert_documents` regardless of `book_id` — it predates multi-book and would take the
+memoir with it. `seed-sandbox.mjs` is scoped with `.eq("book_id", …)`; copy that pattern.
+
+**Two editorial passes, deliberately separate** (`src/lib/editorial.mjs` holds both prompts;
+the API routes and the CLI scripts import the same copy, because they had already drifted):
+- **assess** — one chapter. A verdict on the chapter as a whole (`unwritten`→`finished`) plus a
+  per-paragraph score. Never judges continuity: it is only ever shown one chapter.
+- **continuity** — the whole book, uncompressed, three independent passes merged. Summaries drop
+  exactly the small facts (an age, a colour, whether the ground was still wet) contradictions are
+  made of. Runs disagree a lot, so agreement is displayed (`3/3`), not hidden.
+
 ## Working with the Manuscript
 
 **Start here: `scripts/chapter.mjs`.** One command for the whole editing loop, and
