@@ -244,8 +244,11 @@ switch (cmd) {
         console.log(`                 → 'pull' to bring the live text into git`);
       }
     }
+    // Compare instants, not strings: Postgres returns "+00:00" and
+    // Date#toISOString writes "Z", and "+" sorts before "Z".
+    const older = (a, b) => new Date(a).getTime() < new Date(b).getTime();
     console.log(`  index          ${!sum ? "never built"
-      : sum.source_updated_at < doc.updated_at ? "STALE — rerun summarize-chapter.mjs" : "fresh"}`);
+      : older(sum.source_updated_at, doc.updated_at) ? "STALE — rerun summarize-chapter.mjs" : "fresh"}`);
     const problems = corruption(doc.content);
     if (problems.length) {
       console.log(`  CORRUPTION     ${problems.length} sign(s) of leaked markup in the prose:`);

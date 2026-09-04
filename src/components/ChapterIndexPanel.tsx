@@ -73,7 +73,12 @@ export default function ChapterIndexPanel({
     };
   }, [documentId]);
 
-  const stale = summary ? summary.source_updated_at < documentUpdatedAt : false;
+  // Compare as instants, not strings: Postgres returns "+00:00" while
+  // Date#toISOString writes "Z", and "+" sorts before "Z", so a string compare
+  // reports a freshly built index as stale.
+  const stale = summary
+    ? new Date(summary.source_updated_at).getTime() < new Date(documentUpdatedAt).getTime()
+    : false;
 
   /** Paragraph text, in the order the editor renders it. */
   const paragraphs = useMemo(() => {
@@ -378,43 +383,57 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
+const ITEM_START = /^\s*(?:[-•*]\s|\d+[.)]\s)/;
+
 /**
- * Render the notes with the little structure they carry — ALL-CAPS lines and
- * numbered items become headings and list items — so a long diagnosis reads as
- * a document instead of a wall of monospace.
+ * Notes are written hard-wrapped at ~80 columns for the terminal, so rendering
+ * their newlines verbatim gives a ragged right edge in a narrow panel. Join
+ * each item's continuation lines back into one flowing paragraph, starting a
+ * new item only on a bullet or a number.
+ */
+function reflow(block: string): string[] {
+  const items: string[] = [];
+  for (const raw of block.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (ITEM_START.test(line) || items.length === 0) items.push(line);
+    else items[items.length - 1] += " " + line;
+  }
+  return items;
+}
+
+/**
+ * Render the notes with the little structure they carry — ALL-CAPS lines become
+ * headings, bullets and numbers become list items — so a long diagnosis reads
+ * as a document rather than a wall of text.
  */
 function Notes({ text }: { text: string }) {
   const blocks = text.trim().split(/\n\s*\n/);
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       {blocks.map((block, i) => {
-        const line = block.trim();
-        const isHeading = /^[A-Z][A-Z0-9 ,'’()—-]{5,}$/.test(line.split("\n")[0].trim());
-        if (isHeading) {
-          const [head, ...rest] = line.split("\n");
-          return (
-            <div key={i}>
-              <h4 className="text-[11px] font-semibold text-zinc-800 tracking-wide">
-                {head.trim()}
-              </h4>
-              {rest.length > 0 && (
-                <p className="text-[12px] text-zinc-600 leading-relaxed mt-1 whitespace-pre-line">
-                  {rest.join("\n").trim()}
-                </p>
-              )}
-            </div>
-          );
-        }
-        const isListItem = /^[-•*]\s|^\d+\.\s/.test(line);
+        const lines = block.trim().split("\n");
+        const first = lines[0].trim();
+        const isHeading = /^[A-Z][A-Z0-9 ,'’()—:-]{5,}$/.test(first);
+        const body = isHeading ? lines.slice(1).join("\n") : block;
+        const items = body.trim() ? reflow(body) : [];
+
         return (
-          <p
-            key={i}
-            className={`text-[12px] text-zinc-600 leading-relaxed whitespace-pre-line ${
-              isListItem ? "pl-3 border-l-2 border-zinc-100" : ""
-            }`}
-          >
-            {line}
-          </p>
+          <div key={i} className="space-y-1.5">
+            {isHeading && (
+              <h4 className="text-[11px] font-semibold text-zinc-800 tracking-wide">{first}</h4>
+            )}
+            {items.map((item, j) => (
+              <p
+                key={j}
+                className={`text-[12px] text-zinc-600 leading-relaxed ${
+                  ITEM_START.test(item) ? "pl-2.5 border-l-2 border-zinc-100" : ""
+                }`}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
         );
       })}
     </div>
