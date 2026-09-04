@@ -313,10 +313,20 @@ export async function runContinuity(bookText, { passes = 3 } = {}) {
       .trim();
   const fingerprint = (c) => ({
     chapters: [...new Set(c.chapters || [])].sort((a, b) => a - b).join(","),
-    quotes: new Set(
-      (c.evidence || []).map((e) => norm(e.quote).slice(0, 40)).filter(Boolean)
-    ),
+    quotes: (c.evidence || []).map((e) => norm(e.quote)).filter(Boolean),
   });
+
+  // Containment, not equality. One pass cites "Danny was seven that summer";
+  // another cites "Danny was seven that summer... That was the summer of 1987"
+  // as a single run of evidence. Comparing fixed-length prefixes called those
+  // two different findings and printed the same age error twice, as 2/3 and
+  // 1/3 — a fabricated disagreement, which is worse than not merging at all.
+  const HEAD = 24;
+  const sameQuote = (a, b) =>
+    a === b || (b.length >= HEAD && a.includes(b.slice(0, HEAD))) ||
+    (a.length >= HEAD && b.includes(a.slice(0, HEAD)));
+  const overlaps = (a, b) =>
+    !a.quotes.length || !b.quotes.length || a.quotes.some((q) => b.quotes.some((r) => sameQuote(q, r)));
 
   const RANK = { certain: 0, likely: 1, possible: 2 };
   const groups = [];
@@ -326,12 +336,7 @@ export async function runContinuity(bookText, { passes = 3 } = {}) {
     for (const c of pass?.contradictions || []) {
       const fp = fingerprint(c);
       const hit = groups.find(
-        (g) =>
-          !claimed.has(g) &&
-          g.fp.chapters === fp.chapters &&
-          (fp.quotes.size === 0 ||
-            g.fp.quotes.size === 0 ||
-            [...fp.quotes].some((q) => g.fp.quotes.has(q)))
+        (g) => !claimed.has(g) && g.fp.chapters === fp.chapters && overlaps(fp, g.fp)
       );
       if (!hit) {
         const g = { fp, item: { ...c, agreed: 1 } };
@@ -342,7 +347,7 @@ export async function runContinuity(bookText, { passes = 3 } = {}) {
       claimed.add(hit);
       hit.item.agreed++;
       // Widen the fingerprint so a later pass quoting either span still lands here.
-      for (const q of fp.quotes) hit.fp.quotes.add(q);
+      hit.fp.quotes.push(...fp.quotes);
       // Keep the best-evidenced wording of a finding several passes agree on.
       const better =
         (RANK[c.confidence] ?? 3) < (RANK[hit.item.confidence] ?? 3) ||
