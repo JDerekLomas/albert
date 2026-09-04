@@ -215,6 +215,19 @@ Rules:
 - If you are not certain, still report it, but mark confidence honestly. A false alarm the author dismisses in five seconds is cheaper than a missed one that reaches print.
 - Then build the ledger: the recurring facts and their value in each chapter, so the author can see the book's own record at a glance.`;
 
+/**
+ * Assess one chapter: a verdict on the whole thing plus a score per paragraph.
+ * Shared by /api/assess (one chapter, on demand), /api/assess-book (the whole
+ * book, to fill in the map) and scripts/assess-chapter.mjs.
+ */
+export async function assessChapter(title, contentHtml) {
+  const paras = paragraphs(contentHtml || "").filter((p) => p.text);
+  if (!paras.length) return { chapter: null, passages: [], paragraphCount: 0 };
+  const numbered = paras.map((p) => `[${p.index}] ${p.text}`).join("\n\n");
+  const parsed = await callGemini(ASSESS_SYSTEM, `${title || ""}\n\n${numbered}`, ASSESS_SCHEMA);
+  return { ...normalizeAssessment(parsed, paras), paragraphCount: paras.length };
+}
+
 /** Paragraph text in document order, matching the Nth <p> node in the editor. */
 export function paragraphs(html) {
   const out = [];

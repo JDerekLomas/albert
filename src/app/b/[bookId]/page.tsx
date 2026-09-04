@@ -6,6 +6,7 @@ import { supabase, Book, Document } from "@/lib/supabase";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import ContinuityPanel from "@/components/ContinuityPanel";
+import BookMap from "@/components/BookMap";
 
 export default function BookPage() {
   const params = useParams();
@@ -76,7 +77,6 @@ export default function BookPage() {
     return `${Math.floor(seconds / 86400)}d ago`;
   }
 
-  const totalWords = chapters.reduce((sum, ch) => sum + wordCount(ch.content), 0);
 
   // Group chapters by part_number for display; part openers (chapter_number
   // null but part_number set) supply the part label.
@@ -124,13 +124,11 @@ export default function BookPage() {
         </button>
       </div>
 
-      {chapters.length > 0 && (
-        <div className="flex gap-6 text-sm text-zinc-400 mb-8 border-b border-zinc-100 pb-4">
-          <span>{chapters.length} chapters</span>
-          <span>{totalWords.toLocaleString()} words</span>
-          <span>~{Math.ceil(totalWords / 250)} pages</span>
-        </div>
-      )}
+      <div className="mb-8 border-b border-zinc-100 pb-2" />
+
+      {/* The book from above, before the list of documents: length, state,
+          what's waiting on a person. */}
+      <BookMap bookId={bookId} chapters={chapters} partLabels={partLabels} />
 
       {/* Book-level, so it sits with the book — not inside a chapter, where it
           could only ever see one chapter at a time. */}

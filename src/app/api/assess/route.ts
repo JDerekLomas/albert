@@ -1,11 +1,5 @@
 import { NextRequest } from "next/server";
-import {
-  ASSESS_SCHEMA,
-  ASSESS_SYSTEM,
-  callGemini,
-  normalizeAssessment,
-  paragraphs,
-} from "@/lib/editorial.mjs";
+import { assessChapter, paragraphs } from "@/lib/editorial.mjs";
 
 /**
  * Editorial heat map for one chapter: a verdict on the chapter as a whole, plus
@@ -34,14 +28,9 @@ export async function POST(req: NextRequest) {
   const paras = paragraphs(content).filter((p: { text: string }) => p.text);
   if (!paras.length) return Response.json({ passages: [] });
 
-  const numbered = paras
-    .map((p: { index: number; text: string }) => `[${p.index}] ${p.text}`)
-    .join("\n\n");
-
   try {
-    const parsed = await callGemini(ASSESS_SYSTEM, `${title || ""}\n\n${numbered}`, ASSESS_SCHEMA);
-    const { chapter, passages } = normalizeAssessment(parsed, paras);
-    return Response.json({ chapter, passages, paragraphCount: paras.length });
+    const { chapter, passages, paragraphCount } = await assessChapter(title, content);
+    return Response.json({ chapter, passages, paragraphCount });
   } catch (e) {
     return Response.json(
       { error: e instanceof Error ? e.message : "Assessment failed" },
