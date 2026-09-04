@@ -143,14 +143,16 @@ export function collectSuggestions(editor: {
  * was keeping only the first fragment of it.
  */
 export function suggestionText(suggestion: Suggestion, type: "del" | "ins") {
-  const text = [...suggestion.parts]
+  const spans = [...suggestion.parts]
     .sort((a, b) => a.from - b.from)
     .filter((p) => p.type === type)
-    .map((p) => p.text)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return text || null;
+    .map((p) => p.text.trim())
+    .filter(Boolean);
+  if (!spans.length) return null;
+  // Joined with an ellipsis, not a space: these are separate excerpts with the
+  // untouched words between them removed, and running them together reads as a
+  // broken sentence ("He him he'd did left,") that the reviewer has to decode.
+  return spans.join(" … ").replace(/\s+/g, " ").trim();
 }
 
 /**
@@ -208,8 +210,44 @@ export async function resolveSuggestion(
     }
   }
 
+  dropEmptiedBlocks(tr, editor);
   editor.view.dispatch(tr);
   await logResolution(documentId, suggestion, accept);
+}
+
+/**
+ * Remove blocks the resolution just emptied.
+ *
+ * A suggestion that deletes a whole paragraph deletes its text, not its
+ * container, so resolving one leaves a `<p></p>` behind — a blank gap in the
+ * prose that a reader sees and cannot click into, and that the next suggestion
+ * pass then diffs against. The CLI path already stripped these; the browser
+ * path did not, so the same accept produced a different document depending on
+ * where it was clicked.
+ *
+ * Only blocks emptied by THIS transaction are removed: an empty paragraph the
+ * author typed and is about to write into is theirs to keep.
+ */
+function dropEmptiedBlocks(
+  tr: import("@tiptap/pm/state").Transaction,
+  editor: import("@tiptap/react").Editor
+) {
+  // Positions shift as the transaction deletes text, so an already-empty block
+  // has to be mapped forward before it can be compared with the new document.
+  const wasEmpty = new Set<number>();
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isTextblock && node.content.size === 0) wasEmpty.add(tr.mapping.map(pos));
+  });
+
+  const empties: number[] = [];
+  tr.doc.descendants((node, pos) => {
+    if (node.isTextblock && node.content.size === 0 && !wasEmpty.has(pos)) empties.push(pos);
+  });
+  // Bottom-up, so earlier positions stay valid as each one is removed.
+  for (const pos of empties.reverse()) {
+    const node = tr.doc.nodeAt(pos);
+    if (node) tr.delete(pos, pos + node.nodeSize);
+  }
 }
 
 export async function resolveAll(
