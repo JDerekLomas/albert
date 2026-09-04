@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { heatBorder, heatColor, type Passage } from "@/lib/passage-heat";
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -51,7 +51,19 @@ export default function PassageHeatPanel({
   onClose: () => void;
 }) {
   const [minScore, setMinScore] = useState(0);
-  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  // "Working" is hidden by default for the same reason it isn't tinted: in a
+  // decent chapter it is most of the list, and it buries the few real problems.
+  // The chip switches it back on.
+  const [hidden, setHidden] = useState<Set<string>>(new Set(["strong"]));
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // When a finding is selected by clicking the prose, bring it into view here.
+  useEffect(() => {
+    if (focused === null) return;
+    listRef.current
+      ?.querySelector(`[data-finding="${focused}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focused]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -165,7 +177,7 @@ export default function PassageHeatPanel({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" ref={listRef}>
         {passages.length === 0 && !loading && (
           <p className="text-[11px] text-zinc-400 px-4 py-6 leading-relaxed">
             Nothing assessed yet. Running this shades each paragraph by how much attention it
@@ -177,6 +189,7 @@ export default function PassageHeatPanel({
           <button
             key={p.index}
             onClick={() => onFocus(focused === p.index ? null : p.index)}
+            data-finding={p.index}
             className={`w-full text-left px-4 py-2.5 border-b border-zinc-50 hover:bg-zinc-50 transition-colors ${
               focused === p.index ? "bg-zinc-50" : ""
             }`}

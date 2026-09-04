@@ -73,8 +73,19 @@ export default function Editor({ document: doc }: { document: Document }) {
         class: "tiptap focus:outline-none",
       },
       handleClick: (_view, _pos, event) => {
-        const target = (event.target as HTMLElement)?.closest("[data-comment-id]");
-        if (target) setShowComments(true);
+        const el = event.target as HTMLElement | null;
+        if (el?.closest("[data-comment-id]")) setShowComments(true);
+        // A tinted paragraph should be able to tell you why it's tinted —
+        // clicking one opens the heat panel and selects its finding, the same
+        // way clicking a comment highlight opens that comment.
+        const heated = el?.closest("[data-passage-index]");
+        if (heated) {
+          const i = Number(heated.getAttribute("data-passage-index"));
+          if (!Number.isNaN(i)) {
+            setShowHeat(true);
+            setHeatFocused(i);
+          }
+        }
         return false;
       },
     },
