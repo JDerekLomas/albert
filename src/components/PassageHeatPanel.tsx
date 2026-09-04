@@ -36,6 +36,8 @@ export default function PassageHeatPanel({
   onRun,
   onFocus,
   focused,
+  includeStrong,
+  onIncludeStrong,
   onClose,
 }: {
   passages: Passage[];
@@ -44,6 +46,8 @@ export default function PassageHeatPanel({
   onRun: () => void;
   onFocus: (index: number | null) => void;
   focused: number | null;
+  includeStrong: boolean;
+  onIncludeStrong: (v: boolean) => void;
   onClose: () => void;
 }) {
   const [minScore, setMinScore] = useState(0);
@@ -133,6 +137,17 @@ export default function PassageHeatPanel({
                 );
               })}
           </div>
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={includeStrong}
+              onChange={(e) => onIncludeStrong(e.target.checked)}
+              className="w-3 h-3 accent-emerald-600 cursor-pointer"
+            />
+            <span className="text-[10px] text-zinc-400">
+              Also shade what&rsquo;s already working
+            </span>
+          </label>
           <label className="block">
             <span className="text-[10px] text-zinc-400">
               Only show at or above {Math.round(minScore * 100)}%

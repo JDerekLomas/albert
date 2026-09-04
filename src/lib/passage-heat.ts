@@ -21,7 +21,15 @@ export type Passage = {
 
 export const passageHeatKey = new PluginKey<PassageHeatState>("passageHeat");
 
-type PassageHeatState = { passages: Passage[]; active: boolean; focused: number | null };
+type PassageHeatState = {
+  passages: Passage[];
+  active: boolean;
+  focused: number | null;
+  /** Tint the paragraphs that are already working. Off by default: in a decent
+   *  chapter most paragraphs are fine, so filling them all turns the page into
+   *  a wash and the few real problems stop standing out. */
+  includeStrong: boolean;
+};
 
 /** Category hue. Low-alpha fills so prose stays readable at any intensity. */
 const HUE: Record<string, string> = {
@@ -53,7 +61,7 @@ export const PassageHeat = Extension.create({
       new Plugin<PassageHeatState>({
         key: passageHeatKey,
         state: {
-          init: () => ({ passages: [], active: false, focused: null }),
+          init: () => ({ passages: [], active: false, focused: null, includeStrong: false }),
           apply(tr, value) {
             const meta = tr.getMeta(passageHeatKey) as Partial<PassageHeatState> | undefined;
             return meta ? { ...value, ...meta } : value;
@@ -73,6 +81,9 @@ export const PassageHeat = Extension.create({
               const p = byIndex.get(paraIndex++);
               if (!p) return false;
               const isFocused = s.focused === p.index;
+              // Working paragraphs stay untinted unless asked for, so the page
+              // shows where the work IS rather than highlighting everything.
+              if (p.category === "strong" && !s.includeStrong && !isFocused) return false;
               decorations.push(
                 Decoration.node(pos, pos + node.nodeSize, {
                   class: `passage-heat${isFocused ? " passage-heat-focused" : ""}`,

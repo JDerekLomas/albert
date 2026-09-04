@@ -47,6 +47,7 @@ export default function Editor({ document: doc }: { document: Document }) {
   const [heatLoading, setHeatLoading] = useState(false);
   const [heatError, setHeatError] = useState<string | null>(null);
   const [heatFocused, setHeatFocused] = useState<number | null>(null);
+  const [heatIncludeStrong, setHeatIncludeStrong] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
@@ -145,8 +146,13 @@ export default function Editor({ document: doc }: { document: Document }) {
   // data or the toggle changes — the document itself never carries them.
   useEffect(() => {
     if (!editor) return;
-    setPassageHeat(editor, { passages: heat, active: showHeat, focused: heatFocused });
-  }, [editor, heat, showHeat, heatFocused]);
+    setPassageHeat(editor, {
+      passages: heat,
+      active: showHeat,
+      focused: heatFocused,
+      includeStrong: heatIncludeStrong,
+    });
+  }, [editor, heat, showHeat, heatFocused, heatIncludeStrong]);
 
   // Clicking a finding scrolls the paragraph it describes into view.
   useEffect(() => {
@@ -464,6 +470,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowAI(false);
                   setShowComments(false);
                   setShowIndex(false);
+                  setShowHeat(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium flex items-center gap-1 ${
@@ -496,6 +503,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowAI(false);
                   setShowComments(false);
                   setShowIndex(false);
+                  setShowHeat(false);
                   setShowSuggestions(false);
                 }
               }}
@@ -542,6 +550,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowAI(false);
                   setShowSuggestions(false);
                   setShowIndex(false);
+                  setShowHeat(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
@@ -562,6 +571,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowAI(false);
                   setShowSuggestions(false);
                   setShowComments(false);
+                  setShowHeat(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
@@ -582,6 +592,7 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowComments(false);
                   setShowSuggestions(false);
                   setShowIndex(false);
+                  setShowHeat(false);
                 }
               }}
               className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium ${
@@ -675,6 +686,8 @@ export default function Editor({ document: doc }: { document: Document }) {
             onRun={runAssessment}
             onFocus={setHeatFocused}
             focused={heatFocused}
+            includeStrong={heatIncludeStrong}
+            onIncludeStrong={setHeatIncludeStrong}
             onClose={() => setShowHeat(false)}
           />
         </div>
