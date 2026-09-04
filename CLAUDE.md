@@ -80,6 +80,15 @@ cares about most.
 row in `albert_documents` regardless of `book_id` — it predates multi-book and would take the
 memoir with it. `seed-sandbox.mjs` is scoped with `.eq("book_id", …)`; copy that pattern.
 
+**The book map** (`/b/<bookId>`) is the view from above: the spine (every chapter
+in order, sized by length, coloured by state), part balance, and a per-chapter row
+with length, state, open questions, pending suggestions, open comments and dialogue
+share. Most of it is computed from the HTML on render — free, exact, never stale
+(`src/lib/book-stats.ts`). The one stored thing is the model's chapter verdict, in
+`albert_chapter_verdicts`, filled by `POST /api/assess-book` and marked stale on read
+whenever `source_updated_at < albert_documents.updated_at`. Chapters with pending
+suggestions are skipped, not scored half-reviewed.
+
 **Two editorial passes, deliberately separate** (`src/lib/editorial.mjs` holds both prompts;
 the API routes and the CLI scripts import the same copy, because they had already drifted):
 - **assess** — one chapter. A verdict on the chapter as a whole (`unwritten`→`finished`) plus a

@@ -121,6 +121,39 @@ provenance — the card shows an author (`CLAUDE`) and the log stores it. What
 doesn't exist is any differentiated treatment: an AI's guess and a human
 editor's line edit look identical and review identically.
 
+## The book map
+
+`/b/<bookId>` now opens with the manuscript seen from above, because the
+structural question — where is this book — had no surface at all.
+
+Most of it costs nothing. Length, open `[bracketed]` questions, pending
+suggestions, open comments, dialogue share, scene breaks, part balance,
+median/longest/shortest are all computed from the HTML on render
+(`src/lib/book-stats.ts`): free, exact, never stale, and none of it was
+surfaced anywhere before. The model's chapter verdict is the only stored piece
+— `albert_chapter_verdicts`, filled by `POST /api/assess-book`, stale on read
+the moment the prose moves under it. Chapters with pending suggestions are
+skipped rather than scored half-reviewed (2 of 22 on the memoir).
+
+**Chapter state is drawn as a diverging scale**, not five categorical hues.
+That was forced, not chosen: the dataviz palette validator hard-failed five
+hues across red/orange/yellow because "sketch" and "draft" sit 9.6 ΔE apart in
+*normal* vision. The failure was the useful part — it says the data is one
+ordered axis with polarity (nothing written ↔ finished), and a warm pole,
+neutral midpoint and cool pole says that honestly.
+
+What the map showed on the first look at the real memoir, none of which anyone
+had asked it: 92,374 words, ~369 pages, Part 1 carrying 32% against Part III's
+20%. And **Ch14 "The Question" is simultaneously the shortest chapter (1,196w),
+the least-spoken (7% of paragraphs contain dialogue, tied lowest), and the most
+commented (12 open)** — the chapter this repo already knows is the problem,
+now falling out of the numbers without anyone needing the backstory.
+
+Note: the memoir's Ch14 came back `draft`, where the fixture's equivalent
+(188 words) came back `unwritten`. 1,196 words is not nothing, so that is
+defensible, but it means the state axis is less sensitive than the fixture
+suggested.
+
 ## Open, not resolved
 
 - **`import-book.mjs:119` deletes every row in `albert_documents`**, not just
