@@ -503,7 +503,6 @@ export default function Editor({ document: doc }: { document: Document }) {
                   setShowAI(false);
                   setShowComments(false);
                   setShowIndex(false);
-                  setShowHeat(false);
                   setShowSuggestions(false);
                 }
               }}
