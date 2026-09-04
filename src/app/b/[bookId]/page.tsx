@@ -64,11 +64,6 @@ export default function BookPage() {
     setOther((docs) => docs.filter((d) => d.id !== id));
   }
 
-  function wordCount(content: string): number {
-    const text = content.replace(/<[^>]+>/g, "").trim();
-    return text ? text.split(/\s+/).length : 0;
-  }
-
   function timeAgo(date: string) {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
     if (seconds < 60) return "just now";
@@ -83,12 +78,6 @@ export default function BookPage() {
   const partLabels: Record<number, string> = {};
   for (const d of other) {
     if (d.part_number != null) partLabels[d.part_number] = d.title;
-  }
-  const groups = new Map<number, Document[]>();
-  for (const ch of chapters) {
-    const key = ch.part_number ?? 0;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(ch);
   }
 
   if (loading) {
@@ -128,7 +117,12 @@ export default function BookPage() {
 
       {/* The book from above, before the list of documents: length, state,
           what's waiting on a person. */}
-      <BookMap bookId={bookId} chapters={chapters} partLabels={partLabels} />
+      <BookMap
+        bookId={bookId}
+        chapters={chapters}
+        partLabels={partLabels}
+        onDelete={deleteDocument}
+      />
 
       {/* Book-level, so it sits with the book — not inside a chapter, where it
           could only ever see one chapter at a time. */}
@@ -141,62 +135,9 @@ export default function BookPage() {
         />
       )}
 
-      {chapters.length > 0 && (
-        <div className="mb-12 space-y-6">
-          {Array.from(groups.entries()).map(([partNum, docs]) => (
-            <div key={partNum}>
-              {partNum > 0 && (
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1 px-4">
-                  {partLabels[partNum] || `Part ${partNum}`}
-                </h2>
-              )}
-              <div className="space-y-0.5">
-                {docs.map((doc) => {
-                  const wc = wordCount(doc.content);
-                  return (
-                    <Link
-                      key={doc.id}
-                      href={`/d/${doc.id}`}
-                      className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-zinc-50 transition-colors group"
-                    >
-                      <span className="text-xs text-zinc-300 font-mono w-6 text-right shrink-0">
-                        {doc.chapter_number}
-                      </span>
-                      <span
-                        title={doc.status || "draft"}
-                        className={`w-2 h-2 rounded-full shrink-0 ${
-                          doc.status === "final"
-                            ? "bg-green-400"
-                            : doc.status === "in-review"
-                              ? "bg-blue-400"
-                              : doc.status === "needs-albert"
-                                ? "bg-amber-400"
-                                : "bg-zinc-200"
-                        }`}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-medium truncate text-sm">{doc.title || "Untitled"}</h3>
-                      </div>
-                      <div className="flex items-center gap-4 shrink-0">
-                        <span className="text-[11px] text-zinc-300 tabular-nums">{wc.toLocaleString()}w</span>
-                        <span className="text-[11px] text-zinc-300 tabular-nums w-12 text-right">
-                          {timeAgo(doc.updated_at)}
-                        </span>
-                        <button
-                          onClick={(e) => deleteDocument(doc.id, e)}
-                          className="text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-xs"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* The chapter list used to be repeated here in full. The map above
+          is the same rows with more in them, so this is only the documents
+          that aren't chapters. */}
 
       {other.filter((d) => d.part_number == null).length > 0 && (
         <div>

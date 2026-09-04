@@ -60,14 +60,24 @@ function stateStyle(state: string | undefined) {
   return (STATE as Record<string, (typeof STATE)[keyof typeof STATE]>)[state ?? ""] ?? UNKNOWN;
 }
 
+function timeAgo(date: string) {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+  return `${Math.floor(seconds / 86400)}d`;
+}
+
 export default function BookMap({
   bookId,
   chapters,
   partLabels,
+  onDelete,
 }: {
   bookId: string;
   chapters: Document[];
   partLabels: Record<number, string>;
+  onDelete: (id: string, e: React.MouseEvent) => void;
 }) {
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({});
   const [comments, setComments] = useState<Record<string, number>>({});
@@ -180,7 +190,13 @@ export default function BookMap({
           { label: "words", value: totals.words.toLocaleString() },
           { label: "chapters", value: String(chapters.length) },
           { label: "pages", value: `~${pages(totals.words)}` },
-          { label: "read time", value: `${Math.round(readingMinutes(totals.words) / 60)}h` },
+          {
+            label: "read time",
+            value:
+              readingMinutes(totals.words) >= 90
+                ? `${Math.round(readingMinutes(totals.words) / 60)}h`
+                : `${readingMinutes(totals.words)}m`,
+          },
           { label: "open questions", value: String(totals.queries), warn: totals.queries > 0 },
           {
             label: "awaiting review",
@@ -393,6 +409,16 @@ export default function BookMap({
                         {Math.round(c.dialogueShare * 100)}%
                       </span>
                     </span>
+
+                    <span className="text-[10px] text-zinc-300 tabular-nums w-8 text-right shrink-0">
+                      {timeAgo(c.doc.updated_at)}
+                    </span>
+                    <button
+                      onClick={(e) => onDelete(c.doc.id, e)}
+                      className="text-[10px] text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shrink-0 w-8 text-right"
+                    >
+                      Delete
+                    </button>
                   </Link>
                 );
               })}
@@ -415,13 +441,18 @@ export default function BookMap({
             </span>
           </h2>
           <div className="space-y-1.5">
-            {assessed
-              .filter((c) => ["unwritten", "sketch"].includes(verdicts[c.doc.id]?.state))
+            {[...assessed]
+              // Always the furthest-from-done, whatever state that is. Filtering
+              // to "unwritten" left the memoir's queue empty and the panel
+              // saying nothing needed writing, on a book where every chapter is
+              // a draft — technically true, useless as an answer to "what now?".
               .sort(
                 (a, b) =>
                   STATE_ORDER.indexOf(verdicts[a.doc.id].state as "draft") -
-                  STATE_ORDER.indexOf(verdicts[b.doc.id].state as "draft")
+                    STATE_ORDER.indexOf(verdicts[b.doc.id].state as "draft") ||
+                  verdicts[b.doc.id].finding_count - verdicts[a.doc.id].finding_count
               )
+              .slice(0, 4)
               .map((c) => {
                 const v = verdicts[c.doc.id];
                 return (
@@ -453,13 +484,6 @@ export default function BookMap({
                   </Link>
                 );
               })}
-            {!assessed.some((c) =>
-              ["unwritten", "sketch"].includes(verdicts[c.doc.id]?.state)
-            ) && (
-              <p className="text-[11px] text-zinc-400">
-                No chapter is still waiting to be written.
-              </p>
-            )}
           </div>
         </div>
       )}
