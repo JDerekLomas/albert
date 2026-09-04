@@ -220,3 +220,16 @@ body {
 .save-indicator {
   animation: fade-in-out 1.5s ease-in-out;
 }
+
+/* Editorial heat map — view-layer decorations, never stored in the document.
+   Padding/negative margin so the tint reads as a band around the paragraph
+   rather than a tight box on the text. */
+.tiptap .passage-heat {
+  padding: 0.35rem 0.6rem;
+  margin: 0 -0.6rem;
+  border-radius: 3px;
+  transition: background-color 0.2s ease, outline-color 0.2s ease;
+}
+.tiptap .passage-heat-focused {
+  outline-offset: 2px;
+}

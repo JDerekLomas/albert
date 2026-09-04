@@ -17,8 +17,10 @@ import CommentsPanel from "./CommentsPanel";
 import SuggestionsPanel from "./SuggestionsPanel";
 import ChapterSidebar from "./ChapterSidebar";
 import ChapterIndexPanel from "./ChapterIndexPanel";
+import PassageHeatPanel from "./PassageHeatPanel";
 import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
 import { CommentHighlight } from "@/lib/comment-mark";
+import { PassageHeat, setPassageHeat, type Passage } from "@/lib/passage-heat";
 
 export default function Editor({ document: doc }: { document: Document }) {
   const [title, setTitle] = useState(doc.title);
@@ -40,6 +42,11 @@ export default function Editor({ document: doc }: { document: Document }) {
   // twice — old text and new text interleaved. Default to the proposed reading
   // (green only) and keep the struck-through original one checkbox away.
   const [showOriginal, setShowOriginal] = useState(false);
+  const [showHeat, setShowHeat] = useState(false);
+  const [heat, setHeat] = useState<Passage[]>([]);
+  const [heatLoading, setHeatLoading] = useState(false);
+  const [heatError, setHeatError] = useState<string | null>(null);
+  const [heatFocused, setHeatFocused] = useState<number | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
@@ -57,6 +64,7 @@ export default function Editor({ document: doc }: { document: Document }) {
       SuggestionInsert,
       SuggestionDelete,
       CommentHighlight,
+      PassageHeat,
     ],
     content: doc.content || "",
     editorProps: {
@@ -111,6 +119,41 @@ export default function Editor({ document: doc }: { document: Document }) {
     },
     [doc.id]
   );
+
+  const runAssessment = useCallback(async () => {
+    if (!editor) return;
+    setHeatLoading(true);
+    setHeatError(null);
+    try {
+      const res = await fetch("/api/assess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: doc.title, content: editor.getHTML() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+      setHeat(data.passages || []);
+      setShowHeat(true);
+    } catch (e) {
+      setHeatError(e instanceof Error ? e.message : "Assessment failed");
+    } finally {
+      setHeatLoading(false);
+    }
+  }, [editor, doc.title]);
+
+  // Decorations live in the view, so they have to be re-pushed whenever the
+  // data or the toggle changes — the document itself never carries them.
+  useEffect(() => {
+    if (!editor) return;
+    setPassageHeat(editor, { passages: heat, active: showHeat, focused: heatFocused });
+  }, [editor, heat, showHeat, heatFocused]);
+
+  // Clicking a finding scrolls the paragraph it describes into view.
+  useEffect(() => {
+    if (!editor || heatFocused === null) return;
+    const el = editor.view.dom.querySelector(`[data-passage-index="${heatFocused}"]`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [editor, heatFocused]);
 
   const saveTitle = useCallback(
     async (newTitle: string) => {
@@ -444,6 +487,37 @@ export default function Editor({ document: doc }: { document: Document }) {
               )}
             </button>
 
+            {/* Heat map toggle */}
+            <button
+              onClick={() => {
+                const opening = !showHeat;
+                setShowHeat(opening);
+                if (opening) {
+                  setShowAI(false);
+                  setShowComments(false);
+                  setShowIndex(false);
+                  setShowSuggestions(false);
+                }
+              }}
+              className={`text-[11px] px-2 py-0.5 rounded transition-colors font-medium flex items-center gap-1 ${
+                showHeat
+                  ? "bg-orange-500 text-white"
+                  : "text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              }`}
+              title="Shade each paragraph by how much editing it needs"
+            >
+              Heat
+              {heat.length > 0 && (
+                <span
+                  className={`inline-flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full text-[9px] font-semibold ${
+                    showHeat ? "bg-white/20" : "bg-orange-500 text-white"
+                  }`}
+                >
+                  {heat.filter((p) => p.score >= 0.5).length}
+                </span>
+              )}
+            </button>
+
             {/* Original-text toggle — only meaningful while suggestions are pending */}
             {suggestionCount > 0 && (
               <label
@@ -591,6 +665,21 @@ export default function Editor({ document: doc }: { document: Document }) {
         </footer>
       </div>
 
+      {/* Heat map panel */}
+      {showHeat && (
+        <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
+          <PassageHeatPanel
+            passages={heat}
+            loading={heatLoading}
+            error={heatError}
+            onRun={runAssessment}
+            onFocus={setHeatFocused}
+            focused={heatFocused}
+            onClose={() => setShowHeat(false)}
+          />
+        </div>
+      )}
+
       {/* Suggestions Panel */}
       {showSuggestions && (
         <div className="w-80 border-l border-zinc-100 bg-white flex flex-col shrink-0">
@@ -621,6 +710,7 @@ export default function Editor({ document: doc }: { document: Document }) {
           <ChapterIndexPanel
             documentId={doc.id}
             documentUpdatedAt={doc.updated_at}
+            editor={editor}
             onClose={() => setShowIndex(false)}
           />
         </div>
