@@ -40,6 +40,6 @@ directly; `suggest` is the only way edits reach a chapter.
 
 ## Don't redo
 Importing, formatting, quote conversion, the part-opener extraction — all done and deployed.
-No book index yet for this book; if you need synthesis questions answered, run
-`secret-lover run -- node scripts/summarize-chapter.mjs --book door-in-the-mountain --all`
-then `reindex-book.mjs --book door-in-the-mountain`.
+Chapter summaries and the book index are built and fresh (2026-09-07). After a chapter
+changes, rerun `summarize-chapter.mjs --book door-in-the-mountain --doc <id>` and then
+`reindex-book.mjs --book door-in-the-mountain` (both under `secret-lover run --`).
