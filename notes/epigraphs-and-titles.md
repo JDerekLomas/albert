@@ -169,6 +169,82 @@ Heraclitus fragment 41 is the terser alternative:
 > You could not step twice into the same rivers; for other waters are ever flowing on
 > to you. https://sourcelibrary.org/q/BhEyCwo494MYNtP24iC
 
+## Round three: answers from the book's own traditions
+Chapter-level candidates. Each one answers a question the chapter asks, and each comes
+from a tradition the book actually visits (Vedic, Daoist, Maya, Greek) or from Albert's
+own Chinese inheritance. Public-domain translations unless noted.
+
+### The last page, or the book epigraph: "every culture found a different word"
+**Rig Veda 1.164.46**, the oldest statement of the book's closing sentence.
+> To what is One, the sages give many names; they call him Agni, Yama, and Matarishvan.
+> *ekaṃ sad viprā bahudhā vadanti*
+> https://sourcelibrary.org/q/BgRNUr6e2R9OFPTxJUy (Müller's 1849 Sanskrit; Griffith's
+> 1896 English is public domain: "To what is One, sages give many a title.")
+Put beside the closing paragraph ("The Maya had called it k'uh. The Mongolians hiimori.
+Pohaku called it mana.") this is a 3,000-year-old version of the same sentence.
+
+### Ch3, the piano lesson ("feel the gaps between the notes")
+**Tao Te Ching 11**, Legge 1891.
+> The thirty spokes unite in the one nave; but it is on the empty space (for the axle),
+> that the use of the wheel depends. Clay is fashioned into vessels; but it is on their
+> empty hollowness, that their use depends.
+> https://sourcelibrary.org/q/BgRMhna8uenKpEths1a and ...s1b
+His mother's lesson in a Chinese text, which is also where the middle name comes from.
+For *Yu-Min*, "citizen of the universe," the source is **Diogenes of Sinope**: "When
+asked where he was from, he said, 'I am a citizen of the world.'" (*kosmopolitēs*)
+https://sourcelibrary.org/q/BgTsx0BnZg2WecaFPmR
+
+### Ch18, the origin lake at Metzabok
+**Popol Vuh**, opening of the creation, in the Ximénez manuscript (c. 1701), the only
+surviving copy.
+> Everything was in suspense, in calm, in silence, without movement, with nothing but
+> the empty sky... only the dammed-up water, only the quiet sea... it was only in silence
+> and quiet, in the darkness and the night.
+> https://sourcelibrary.org/q/Bn0a1fFYMTCEUIROCi2
+That is Albert alone in the canoe on the mirrored lake under the full moon, and the
+Lacandon h-men's "we come from the darkness."
+
+### Ch19, Jamie: a musician's death met with music
+**Zhuangzi, Book XVIII**, on the death of his wife, in Legge's 1891 summary of the
+passage. His friend finds him "squatted on the ground, drumming on the vessel, and
+singing."
+> Suddenly in this chaotic condition there ensued a change, and there was breath; another
+> change, and there was the bodily form; a further change, and she was born to life; a
+> change now again, and she is dead. The relation between those changes is like the
+> procession of the four seasons.
+> https://sourcelibrary.org/q/BgRMhna8uenKpEths14
+Same page, two old men looking at graves: "Life is a borrowed thing. The living frame
+thus borrowed is but so much dust. Life and death are like day and night." Charlie's
+"why would you skip the cycle if you liked being in it" has a 2,300-year-old cousin.
+
+### Ch21 and Ch22, Tebo1 and the handprints on the cave
+**Mencius 2A.6**, Legge 1893, on why care is innate.
+> all men have a mind which cannot bear to see the sufferings of others... if men
+> suddenly see a child about to fall into a well, they will without exception experience
+> a feeling of alarm and distress.
+> https://sourcelibrary.org/q/BjcEKnbSqQPZcok7fBW
+Legge's note gives the literal Chinese: "Without the feeling of commiseration there would
+not be man." That is the Borneo cave in one line.
+
+### Ch22, The Boy and the Butterfly
+**Zhuangzi, Book II**, the butterfly dream, Legge 1891. The chapter's title is already
+half of it.
+> I did not know whether it had formerly been Kâu dreaming that he was a butterfly, or
+> it was now a butterfly dreaming that it was Kâu... This is a case of what is called the
+> Transformation of Things.
+> https://sourcelibrary.org/q/BgRMhna8uenKpEths3t
+It also answers the question Albert asks on waking from the amputation (which drawer of
+reality did they put me back in) and the monarchs in the yard.
+
+### The closing argument: love, and "the capacity for the opposite"
+**Empedocles**, quoted in Diogenes Laertius VIII.
+> At one time all things are brought together by love into one, / At another time, they
+> are each borne apart by the strife of hate.
+> https://sourcelibrary.org/q/BhPo88KWLF0F5GW0oGP
+And on the same leaf, a line that could sit over the whole last chapter, boy and fish:
+> For I have been already a boy and a girl, / A bush, a bird, and a mute fish leaping out
+> of the sea.
+
 ## Titles
 
 ### What is working now
