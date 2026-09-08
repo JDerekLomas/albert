@@ -3,7 +3,6 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import { useEffect, useRef, useCallback, useState } from "react";
 import NextLink from "next/link";
@@ -20,6 +19,7 @@ import ChapterIndexPanel from "./ChapterIndexPanel";
 import PassageHeatPanel from "./PassageHeatPanel";
 import { SuggestionInsert, SuggestionDelete, collectSuggestions } from "@/lib/suggestion-marks";
 import { CommentHighlight } from "@/lib/comment-mark";
+import { QueryHighlight } from "@/lib/query-mark";
 import {
   PassageHeat,
   setPassageHeat,
@@ -66,7 +66,7 @@ export default function Editor({ document: doc }: { document: Document }) {
       Placeholder.configure({
         placeholder: 'Start writing... (press "/" for commands)',
       }),
-      Highlight,
+      QueryHighlight,
       Typography,
       SuggestionInsert,
       SuggestionDelete,

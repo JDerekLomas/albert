@@ -3,7 +3,7 @@
  * chapter.mjs — the one command for working on a chapter with someone else.
  *
  * The editing loop has three surfaces that can disagree: the git manuscript
- * (`manuscript/partN/chNN-*.txt`), the live Supabase document Albert edits in
+ * (`manuscripts/<book-id>/partN/chNN-*.txt`), the live Supabase document Albert edits in
  * the browser, and any pending suggestions sitting on top of that document.
  * Every previous session hand-rolled throwaway scripts to answer "are these
  * three in sync?" and got it wrong in two different ways (attribute order,
@@ -48,9 +48,11 @@ if (bookFlag !== -1) {
   BOOK = argv[bookFlag + 1];
   argv.splice(bookFlag, 2);
 }
-/** Only the memoir is mirrored in manuscript/. Other books live in the DB
- *  alone, so the git-divergence machinery has nothing to compare against. */
-const TRACKED_IN_GIT = BOOK === "albert-lin-memoir";
+/** A book is mirrored in git iff manuscripts/<book-id>/ exists (the sandbox
+ *  lives in the DB alone, so the git-divergence machinery has nothing to
+ *  compare against for it). */
+const MANUSCRIPT_DIR = join(ROOT, "manuscripts", BOOK);
+const TRACKED_IN_GIT = existsSync(MANUSCRIPT_DIR);
 
 // ---- env ----------------------------------------------------------------
 for (const f of [".env.local", ".env"]) {
@@ -126,9 +128,15 @@ function htmlToManuscript(html, { view = "original" } = {}) {
     let inner = m[2]
       .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, "**$2**")
       .replace(/<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi, "*$2*");
+    // An epigraph is a blockquote of several <p>s (quote, then —attribution);
+    // the manuscript files keep those on consecutive lines of one paragraph.
+    const isQuote = m[1].toLowerCase() === "blockquote";
+    if (isQuote) inner = inner.replace(/<\/p>\s*<p\b[^>]*>/gi, "\n");
     let t = inner.replace(/<[^>]+>/g, "");
     for (const [rx, to] of ENTITIES) t = t.replace(rx, to);
-    t = t.replace(/\s+/g, " ").trim();
+    t = isQuote
+      ? t.split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n")
+      : t.replace(/\s+/g, " ").trim();
     if (m[1].toLowerCase() === "h1") continue; // title lives in the title column
     if (t) paras.push(t);
   }
@@ -174,7 +182,7 @@ function corruption(html) {
 function manuscriptPath(chapterNumber) {
   if (!TRACKED_IN_GIT) return null;
   for (const part of [1, 2, 3, 4]) {
-    const dir = join(ROOT, "manuscript", `part${part}`);
+    const dir = join(MANUSCRIPT_DIR, `part${part}`);
     if (!existsSync(dir)) continue;
     const f = readdirSync(dir).find((n) =>
       new RegExp(`^ch0*${chapterNumber}-`).test(n)

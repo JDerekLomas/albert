@@ -6,7 +6,17 @@
 A collaborative manuscript editor — originally built for Albert Lin's memoir, now multi-project
 (as of 2026-09-02). The memoir covers his life as a National Geographic explorer, the search for
 Genghis Khan's tomb, losing his leg, his Lost Cities TV career, and his son Charlie's TBI
-recovery — 22 chapters across 4 parts, ~92k words, book id `albert-lin-memoir`.
+recovery — 22 chapters across 4 parts, ~90k words.
+
+**Two live drafts of the same memoir, as separate books** (as of 2026-09-07):
+- `door-in-the-mountain` — **"The Door in the Mountain"**, Albert's Sept 7 2026 drop. The
+  current draft; new editorial work goes here. 21 chapters: Chapter 14 ("The Question") is
+  gone from this draft and Chapter 10 is now "El Robotico"; Chapter 1 is a prologue that
+  precedes the Part I title page in Albert's file (the importer lifts the title page into the
+  Part I opener doc, so the book map shows it as Part I's first chapter).
+- `albert-lin-memoir` — the Sept 2 drop, with Derek's Ch14 work and comments in flight. Kept
+  intact; don't import over it.
+Each book's git mirror lives at `manuscripts/<book-id>/`.
 
 ## Architecture
 - **Next.js 16 + TipTap** rich text editor with real-time collaboration
@@ -76,9 +86,10 @@ traps** (a fragment-voice paragraph, a quiet paragraph doing quiet work) — fla
 the tool has started scoring polish instead of need for work, which is the failure this repo
 cares about most.
 
-**Do NOT run `import-book.mjs` for the sandbox, or for any second book.** Line 119 deletes every
-row in `albert_documents` regardless of `book_id` — it predates multi-book and would take the
-memoir with it. `seed-sandbox.mjs` is scoped with `.eq("book_id", …)`; copy that pattern.
+`import-book.mjs` is scoped by `book_id` since 2026-09-07 (it used to clear the whole
+table); the sandbox still has its own `seed-sandbox.mjs` because its fixture lives in
+`sandbox/`, not `manuscripts/`. Any deletion in a new script must be `.eq("book_id", …)`,
+never a bare table clear.
 
 **The book map** (`/b/<bookId>`) is the view from above: the spine (every chapter
 in order, sized by length, coloured by state), part balance, and a per-chapter row
@@ -104,6 +115,9 @@ it loads `.env.local` itself — no `set -a; source .env.local` dance, no throwa
 `_tmp-*.mjs` scripts (three past sessions hand-rolled those and two got the HTML
 parsing subtly wrong).
 ```bash
+# Every command takes --book <id>; the default is albert-lin-memoir (the older draft), so
+# work on the current draft needs --book door-in-the-mountain.
+node scripts/chapter.mjs --book door-in-the-mountain status 19
 node scripts/chapter.mjs status 14              # pending suggestions, comments, git sync, index staleness
 node scripts/chapter.mjs read   14 -o draft.txt # live chapter as editable plain text
 node scripts/chapter.mjs read   14 --accepted   # preview with all suggestions applied
@@ -157,31 +171,40 @@ the tag — reuse that, don't re-derive it.
   (`gemini-3-flash-preview`) via `/api/ai`, not Claude — the stored `ANTHROPIC_API_KEY` (both
   locally and on Vercel) is dead; don't spend time trying to revive it, just use Gemini like
   everything else here does.
-- **Text-in-git is the source of truth.** `manuscript/part{1,2,3,4}/*.txt` — one file per
-  chapter (`chNN-slug.txt`) plus a `00-part-opener.txt` per part that has a title/epigraph.
-  `scripts/split-manuscript.mjs` regenerates these from Albert's raw `~/Downloads/PART_*.txt`
-  drops; `scripts/import-book.mjs --book-id <id> --title "<title>" --confirm` rebuilds
-  Supabase FROM these files (dry-run without `--confirm`) — always this direction, git → DB,
-  never the reverse. `chapter_number` is the running number across all 4 parts (1–22, not
+- **Text-in-git is the source of truth.** `manuscripts/<book-id>/part{1,2,3,4}/*.txt` — one
+  file per chapter (`chNN-slug.txt`) plus a `00-part-opener.txt` per part that has a
+  title/epigraph. `scripts/split-manuscript.mjs --book <id> --files <4 PART files in order>`
+  generates these from Albert's raw `~/Downloads/PART_*.txt` drops and applies book
+  typography once (curly quotes, ellipses), so git and the live chapter agree character for
+  character. `scripts/import-book.mjs --book-id <id> --title "<title>" --confirm` rebuilds
+  that one book in Supabase FROM these files (dry-run without `--confirm`; `--dump <doc-id>`
+  prints one document's rendered HTML) — always this direction, git → DB, never the reverse.
+  Rendering: `<h1>Chapter N: Title</h1>` first (load-bearing for the scripts), `---` → `<hr>`
+  (shown as a centred ornament), `*x*` → `<em>`, a quote + `—attribution` pair →
+  `<blockquote>` (epigraph styling), `[bracketed notes]` → `<mark data-query="1">` (amber;
+  a whole-paragraph note becomes a note block; multi-paragraph fact-check notes stay
+  multi-paragraph; a `[` that never closes is left as literal text). The editor's
+  `QueryHighlight` mark keeps `data-query` through browser saves so the book map's
+  open-question count survives editing. `chapter_number` is the running number across all 4 parts (1–22, not
   reset per part); `part_number` is 1–4.
 - Chapter document ids follow the pattern `<book-id>-ch-NN` (zero-padded); part openers are
   `<book-id>-part-N`.
 
 ## For Albert (or Albert's Claude Code)
-- **Yellow highlighted blocks** (`background: #fef3c7`) are questions/requests for Albert
-- **Purple highlighted blocks** (`background: #ede9fe`) are episode questions
-- To answer a question: edit the chapter in the web editor, replace the yellow block with your content
+- **Amber note blocks** are Albert's own `[bracketed notes]` from the draft — open questions,
+  fact checks, "better quote here" — plus any `[[CHECKED. …]]` replies already folded into the
+  file. They are counted as "open questions" on the book map.
+- To answer a question: edit the chapter in the web editor, replace the note with your content
 - After editing, click "Save version" to create a snapshot before and after changes
 - The "History" page shows diffs between any two versions
 
 ## Key Commands
 ```bash
-# Split Albert's raw ~/Downloads/PART_*.txt drops into manuscript/part{1-4}/*.txt
-node scripts/split-manuscript.mjs
+# Split Albert's raw ~/Downloads/PART_*.txt drops into manuscripts/<book-id>/part{1-4}/*.txt
+node scripts/split-manuscript.mjs --book <book-id> --files ~/Downloads/PART_I.txt ~/Downloads/PART_II.txt ~/Downloads/PART_III.txt ~/Downloads/PART_IV.txt
 
-# Rebuild a book in Supabase from the git manuscript/ files (dry run without --confirm)
-set -a; source .env.local; set +a
-node scripts/import-book.mjs --book-id albert-lin-memoir --title "..." --confirm
+# Rebuild ONE book in Supabase from its manuscripts/<book-id>/ files (dry run without --confirm)
+node scripts/import-book.mjs --book-id door-in-the-mountain --title "The Door in the Mountain" --confirm
 
 # Propose AI edits to a chapter as reviewable suggestions (never overwrites)
 set -a; source .env.local; set +a

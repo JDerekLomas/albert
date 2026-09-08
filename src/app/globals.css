@@ -30,6 +30,19 @@ body {
   line-height: 1.2;
 }
 
+/* The chapter opening: the importer writes <h1>Chapter N: Title</h1> as the
+   first node of every chapter (chapter.mjs and suggest-chapter.mjs key on
+   that exact shape, so the number and title stay in one heading). Set it
+   the way a chapter opens on a printed page — centred, with air above and
+   below — so the manuscript reads as a book rather than a document. */
+.tiptap > h1:first-child {
+  text-align: center;
+  font-size: 1.7em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 1.6em 0 2.2em;
+}
+
 .tiptap h2 {
   font-size: 1.5em;
   font-weight: 600;
@@ -62,12 +75,26 @@ body {
   margin: 0.2em 0;
 }
 
+/* Epigraphs — a part opener's quote, or a quote with its —attribution on
+   the next line inside a chapter. Set as a book sets them: indented, no rule,
+   the attribution upright and a step smaller. */
 .tiptap blockquote {
-  border-left: 3px solid #d1d5db;
-  padding-left: 1em;
-  margin: 0.5em 0;
-  color: #6b7280;
+  border: none;
+  margin: 1.5em auto;
+  padding: 0 2em;
+  max-width: 34em;
+  color: #4b5563;
   font-style: italic;
+}
+
+.tiptap blockquote p {
+  margin: 0.3em 0;
+}
+
+.tiptap blockquote p:last-child:not(:only-child) {
+  font-style: normal;
+  font-size: 0.9em;
+  color: #6b7280;
 }
 
 .tiptap code {
@@ -95,10 +122,21 @@ body {
   font-size: 0.875em;
 }
 
+/* Scene break (the manuscript's `---`): a centred ornament, not a rule. */
 .tiptap hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 1.5em 0;
+  height: auto;
+  margin: 2.2em 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 1em;
+  line-height: 1;
+}
+
+.tiptap hr::before {
+  content: "•   •   •";
+  white-space: pre;
+  letter-spacing: 0.2em;
 }
 
 .tiptap a {
@@ -110,6 +148,30 @@ body {
   background: #fef08a;
   border-radius: 2px;
   padding: 0 2px;
+}
+
+/* Albert's [bracketed notes] — open questions, fact checks, "better quote
+   here". Amber rather than highlighter yellow, so they read as margin notes.
+   A paragraph that is nothing but a note becomes a note block. */
+.tiptap mark[data-query] {
+  background: #fef3c7;
+  color: #78350f;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.tiptap p:has(> mark[data-query]:only-child) {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  padding: 0.5em 0.9em;
+  margin: 0.8em 0;
+  font-size: 0.95em;
+  border-radius: 0 4px 4px 0;
+}
+
+.tiptap p:has(> mark[data-query]:only-child) mark[data-query] {
+  background: none;
+  padding: 0;
 }
 
 /* Suggestion review layer — pending AI/human edits, not yet accepted */
