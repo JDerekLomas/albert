@@ -70,6 +70,32 @@ PART IV   THE SOURCE
 There is no Chapter 14 in Albert's file. The numbering is his and is left alone here; if he
 renumbers, the ids `door-in-the-mountain-ch-NN` will need to move with it.
 
+## Book epigraph
+
+Derek's second pass (below) adds a slot the first draft lacked: an epigraph for the book
+itself, before Part I. The Secret History passage belongs there rather than on Part I,
+because it is the passage the title comes from: the mountain that hid Temüjin when he was
+nothing. If it moves up, Part I takes Diogenes ("I am a citizen of the world"), which is
+Yu-Min, "citizen of the universe," the name Chapter 3 explains.
+
+> By Mount Burqan Qaldun, as to my life, which is only so much as a grasshopper, I was
+> shielded. Every morning I shall sacrifice unto Mount Burqan. Every day I shall pray unto
+> it. Let the seed of my seed observe this.
+>
+> — *The Secret History of the Mongols*, §103, c. 1240
+
+https://sourcelibrary.org/q/Bioqutze2spmVT2YpxW (Cleaves; note "louse" in some
+renderings where Cleaves's page has "grasshopper").
+
+Other book-level candidates from the second pass:
+
+- "To what is One, the sages give many names; they call him Agni, Yama, and Matarishvan."
+  Rig Veda 1.164.46. This is the book's closing argument in one Vedic line.
+  https://sourcelibrary.org/q/BgRNUr6e2R9OFPTxJUy
+- "Om! This syllable is this whole world. The past, the present, the future, everything is
+  just the word Om." Māṇḍūkya Upaniṣad 1, trans. Hume, 1921.
+  https://sourcelibrary.org/q/BgTWpKOzEuBoNwN1WoP
+
 ## Part titles and epigraphs
 
 ### Part I. The Tomb (was: The Ground)
@@ -244,6 +270,115 @@ through the pines. Alt: *Tebo1*, "the first. The source."
 **22. Stoke** (was The Boy and the Butterfly). Charlie's word for what he felt in the
 white void, said "deadpan, innocent and unassuming." The book ends on a fish, so it ends on
 joy. Alt: *Metamorphosis*.
+
+## More candidates, second pass (Derek, 2026-09-08)
+
+All verified on the page in Source Library; links go to the scan. Grouped by part, with
+the chapter each one is aimed at where Derek named one.
+
+### Part I
+
+- "When asked where he was from, he said, 'I am a citizen of the world.'" Diogenes of
+  Sinope, in Diogenes Laertius VI. Yu-Min. https://sourcelibrary.org/q/BgTsx0BnZg2WecaFPmR
+- "The thirty spokes unite in the one nave; but it is on the empty space (for the axle),
+  that the use of the wheel depends. Clay is fashioned into vessels; but it is on their
+  empty hollowness, that their use depends." Tao Te Ching 11, trans. Legge, 1891.
+  https://sourcelibrary.org/q/BgRMhna8uenKpEths1a
+
+### Part II
+
+Candidates that answer the part's question:
+
+- Böhme's hinge (already above). Next sentence, §21: if life "gives itself into a Nothing,
+  so that it leaves the Something in selfhood … it can burn in no torment."
+  https://sourcelibrary.org/q/Bhtz105zlkl4wXdV4h7
+- "The body, consisting of arms and legs, cannot be the Atman, for one continues to live
+  even when particular limbs are gone." Śaṅkara, Vivekacūḍāmaṇi 156, trans. Chatterji,
+  1921. Almost too exact. https://sourcelibrary.org/q/BgTWwFlfGWHRrruHhy1
+
+Candidates that restate the theme:
+
+- "That it may be able to be born, it desires first to die. It is its own offspring, its
+  own father, and its own heir, its own nurse, ever a foster-child to itself. It is indeed
+  the same, yet it is not the same, having attained eternal life through the boon of
+  death." Lactantius, De Ave Phoenice, c. 300. The phoenix he tells Charlie about in
+  Chapter 21, and the wing stickers on the first prosthetic.
+  https://sourcelibrary.org/q/BgUulnu3knOpLXtCY6w
+- "God is day and night, winter and summer, war and peace, surfeit and hunger. But he
+  undergoes transformations, just as fire, when it is mixed with spices, is named after the
+  individual scent of each." Heraclitus, fr. 36.
+  https://sourcelibrary.org/q/BhEyCwo494MYNtP24iC
+- "For that very thing which kills also makes alive again." Salomon Trismosin, Aureum
+  Vellus, 1600. https://sourcelibrary.org/q/BhbmpwxosXOpLGyaVeg
+- "What is placed in the fire has a valuable role to play but leaves nothing behind when
+  it's gone." Sumerian proverb, c. 2000 BC. AI rendering of a fragmentary line; check the
+  ETCSL edition before print. https://sourcelibrary.org/q/BhF3jRmHHbcatfZ1294
+- "the fire begets the matter that destroys and kills it, and makes it live again."
+  Reusner, Pandora. https://sourcelibrary.org/q/BhLyEGicZP9Cs92Ruf1
+- "corruption and death serve to spiritualize, refine the essence, and, so to speak,
+  glorify things." Flamel, Book of Hieroglyphic Figures.
+  https://sourcelibrary.org/q/BhLy6lLg9xB88KbQwvU
+
+### Part III
+
+- "the wise forbade speaking while passing through either doors or gates, venerating in
+  silence the God who is the principle of the universe." Porphyry, On the Cave of the
+  Nymphs. https://sourcelibrary.org/q/BhNfViNqCqqdiI5kB4X
+- "both are gates of souls, but one is for those coming toward humans, and the other for
+  those ascending to the gods." Porphyry, same work, on Homer's cave with two gates.
+  https://sourcelibrary.org/q/BeuqrTRbjvzvU6nPxn5
+- "If you seek the Dao, enter the mountain." Ge Hong, Baopuzi, 4th c., quoting the Dunjia
+  zhongjing. Seven words, and it is the title. https://sourcelibrary.org/q/BjXz6MLufZIQMtuYRIq
+- "Imagination is a Sun in man acting upon his own body … whatever a man imagines, this
+  very thing exists. If he thinks of fire, it is fire." Paracelsus, as reported by Thomas
+  Erastus, 1572. The thesis Part IV tests. https://sourcelibrary.org/q/BhtmuzM49aP6USDpSNH
+- "It is not what you bear, but how you bear it that matters." Seneca, De Providentia
+  II.4. Pohaku's creed, Chapter 15. https://sourcelibrary.org/q/BiPweMIYPLUg37NUWwT
+- "What is in my power? To choose the pilot, the sailors, the day, the opportunity. Then a
+  storm descends. … I do that which I can: I do not drown in fear, nor screaming, nor
+  blaming God, but knowing that what has been born must also perish." Epictetus,
+  Discourses II.5. Chapter 15. https://sourcelibrary.org/q/BilNqLWaPaFpVAdU8MG
+- "Everything was in suspense, in calm, in silence, without movement, with nothing but the
+  empty sky … only the dammed-up water, only the quiet sea … it was only in silence and
+  quiet, in the darkness and the night." Popol Vuh, opening, Ximénez MS. Chapter 18, the
+  origin lake. https://sourcelibrary.org/q/Bn0a1fFYMTCEUIROCi2
+
+### Part IV
+
+- "Our bodies are carried away like a river; all that you see runs down with time. Nothing
+  remains the same; even while I say these things are changed, I am changed myself. … The
+  river still keeps its name, but the water passes away." Seneca, Epistle 58.
+  https://sourcelibrary.org/q/BhAuQfr3YJfYNHgYo3z
+- "You could not step twice into the same rivers; for other waters are ever flowing on to
+  you." Heraclitus, fr. 41. https://sourcelibrary.org/q/BhEyCwo494MYNtP24iC
+- "Suddenly in this chaotic condition there ensued a change, and there was breath; another
+  change, and there was the bodily form; a further change, and she was born to life; a
+  change now again, and she is dead. The relation between those changes is like the
+  procession of the four seasons." Zhuangzi XVIII, on the death of his wife, found
+  "drumming on the vessel, and singing," trans. Legge. Chapter 19, Jamie. Same page: "Life
+  and death are like day and night." https://sourcelibrary.org/q/BgRMhna8uenKpEths14
+- "all men have a mind which cannot bear to see the sufferings of others … if men suddenly
+  see a child about to fall into a well, they will without exception experience a feeling
+  of alarm and distress." Mencius 2A.6, trans. Legge, 1893. Tebo1 and the handprints.
+  Legge's note: "Without the feeling of commiseration there would not be man."
+  https://sourcelibrary.org/q/BjcEKnbSqQPZcok7fBW
+- "I did not know whether it had formerly been Kâu dreaming that he was a butterfly, or it
+  was now a butterfly dreaming that it was Kâu … This is a case of what is called the
+  Transformation of Things." Zhuangzi II, trans. Legge. Chapter 22.
+  https://sourcelibrary.org/q/BgRMhna8uenKpEths3t
+- "At one time all things are brought together by love into one, at another time, they are
+  each borne apart by the strife of hate." Empedocles, in Diogenes Laertius VIII. The
+  closing argument. https://sourcelibrary.org/q/BhPo88KWLF0F5GW0oGP
+- "For I have been already a boy and a girl, a bush, a bird, and a mute fish leaping out
+  of the sea." Empedocles, same leaf. The last chapter ends on a fish.
+  https://sourcelibrary.org/q/BhPo88KWLF0F5GW0oGP
+
+### Licensing
+
+Source Library's own translations are CC-BY-SA; for print, quote the original or a
+public-domain translation (Legge, Hume, Chatterji, Griffith, Taylor, Long, Wilkins,
+Evans-Wentz 1927 are all PD). Cleaves's Secret History (1982) is in copyright; a short
+epigraph is fair use but the publisher will want it cleared.
 
 ## Two other ways to name the parts
 
