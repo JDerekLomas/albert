@@ -49,8 +49,39 @@ Keep Machado. It is the right note for the wandering years. If the *Secret Histo
 not used as the book epigraph, it belongs here instead.
 
 ### Part II, The Fire (currently "[Better quote]")
-Ranked. The first is the recommendation.
+Two kinds of candidate. The first group **answers the question the part asks** (who am
+I if the map of me can be redrawn; where does the body end and the mind begin) and is
+probably more interesting on a title page. The second group **restates the theme**
+(fire, phoenix, dissolution) and is safer.
 
+#### Candidates that answer the question
+- **Jacob Böhme, *Weg der Wiedergeburt* (Way to Regeneration), ch. 2 §20.** The German
+  word for hinge here, *Angel*, is a door hinge, which puts a door on the Part II page
+  without saying the word. "Gives itself to" is *Succumb*.
+  > Human life is the hinge between light and darkness: whichever it gives itself to,
+  > in that it burns.
+  > *Das menschliche Leben ist der Angel zwischen Licht und Finsterniß: welchem es sich
+  > ergiebet, in demselben brennet es.*
+  > https://sourcelibrary.org/q/Bhtz105zlkl4wXdV4h7
+  Section 21, the next sentence on the page, is the hospital-pain scene in Ch8 almost
+  verbatim: if life "gives itself into a Nothing, so that it leaves the Something in
+  selfhood... it can burn in no torment." Worth reading the whole leaf.
+- **Māṇḍūkya Upaniṣad 1**, in Hume's 1921 translation, which is public domain and so
+  clears the licensing problem below. Baba Lutlo says almost exactly this on the boat in
+  Ch11, so the part opener would be planting a line the reader hears again at its close.
+  No fire in it.
+  > Om!—This syllable is this whole world. Its further explanation is— The past, the
+  > present, the future—everything is just the word Om.
+  > https://sourcelibrary.org/q/BgTWpKOzEuBoNwN1WoP
+- **Śaṅkara, *Vivekacūḍāmaṇi* 156 (8th c.).** Found while looking for the body/mind
+  border. It is an eerily exact answer to Rama's question, and to an amputee. Better
+  over Ch8 or Ch9 than over the whole part.
+  > The body, consisting of arms and legs, cannot be the Atman, for one continues to
+  > live even when particular limbs are gone.
+  > *pāṇipādādimān deho nātmā vyaṅge 'pi jīvanāt*
+  > https://sourcelibrary.org/q/BgTWwFlfGWHRrruHhy1 (Chatterji 1921, public domain)
+
+#### Candidates that restate the theme
 1. **Lactantius, *De Ave Phoenice* (c. 300 AD), lines 165–170.** The phoenix is already
    in the book: the stickers on the first prosthetic (Ch9), the story whispered to Charlie
    at extubation (Ch21).
@@ -79,13 +110,9 @@ Ranked. The first is the recommendation.
    > when it's gone.
    > https://sourcelibrary.org/q/BhF3jRmHHbcatfZ1294
 
-5. **Māṇḍūkya Upaniṣad 1**, on Om. Probably better as a book epigraph than a Part II one,
-   since Om spans all four parts. (Source Library files this page under a Milarepa
-   collection; the Sanskrit on the leaf is the Upaniṣad, so attribute it to that.)
-   > Om. This syllable Om is all this. What was, what is, and what will be is all just
-   > the syllable Om. And whatever else exists beyond the three times is also just the
-   > syllable Om.
-   > https://sourcelibrary.org/q/BiWomGmYOHAbZ8OX11b
+5. The Upaniṣad, above, also works here if the Sanskrit is wanted on the page: Source
+   Library holds the Devanāgarī leaf misfiled under a Milarepa collection at
+   https://sourcelibrary.org/q/BiWomGmYOHAbZ8OX11b.
 
 ### Part III, The Door (currently María Sabina, "a world far away, nearby, and invisible")
 Keep Sabina; she is the right voice for the cactus and the mushrooms. Two alternates if
@@ -105,6 +132,16 @@ the door image wants an older source:
   tradition, and literally the title.
   > If you seek the Dao, enter the mountain.
   > https://sourcelibrary.org/q/BjXz6MLufZIQMtuYRIq
+- **Paracelsus on imagination**, as reported by his critic Thomas Erastus (1572). This is
+  the thesis Part III believes and Part IV tests, so it is a foil as much as an
+  epigraph. Placed over Part III it would make the Cayambe reversal in Part IV land
+  harder.
+  > Imagination is a Sun in man acting upon his own body... whatever a man imagines,
+  > this very thing exists. If he thinks of fire, it is fire.
+  > *Imaginatio Sol est in homine... quicquid imaginatur homo, hoc ipsum existit.*
+  > https://sourcelibrary.org/q/BhtmuzM49aP6USDpSNH
+  Paracelsus in his own voice, in Turner's 1656 English (public domain): imagination
+  "is the chief and general ruler over all others." https://sourcelibrary.org/q/BhD5jc21ui5f8dTns2P
 
 ### Chapter 15 (Wave Riders): Pohaku's creed has two ancient cousins
 Not epigraphs necessarily, but Albert may want to know the line "you don't choose the
