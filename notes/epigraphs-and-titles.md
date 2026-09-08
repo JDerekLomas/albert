@@ -245,6 +245,28 @@ And on the same leaf, a line that could sit over the whole last chapter, boy and
 > For I have been already a boy and a girl, / A bush, a bird, and a mute fish leaping out
 > of the sea.
 
+## Acquisitions for Source Library (2026-09-08)
+Imported hidden via `/api/import/ia`; they enter the OCR and translation pipeline
+automatically and need a QA pass in sourcelibrary before being flipped visible. Once
+searchable they can feed another quote round (Malo has chapters on heʻe nalu and holua
+sledding; Arriaga is the earliest Andean account of huacas and shamans).
+| Book | Source | Book id | State |
+|---|---|---|---|
+| Malo, *Hawaiian Antiquities* (1903, Emerson trans.) | ia:hawaiianantiquit00malouoft | 6a9fba6eabf09178b36591d3 | new, hidden |
+| *Book of Chilam Balam of Chumayel* (1913 facsimile) | ia:bookofchilambala00hoil | 6a9fba79abf09178b365934e | new, hidden |
+| Pallas, *Nachrichten über die mongolischen Völkerschaften* I (1776) | ia:samlungenhistor00pallgoog | 6a9fba81abf09178b3659449 | new, hidden |
+| Pallas, vol. II (1801) | ia:samlungenhistor01pallgoog | 6a9fba87abf09178b36595a2 | new, hidden |
+| Howorth, *History of the Mongols* Part I (1876) | ia:historymongolsm00howogoog | 6a9fba8fabf09178b36597f2 | new, hidden |
+| Arriaga, *Extirpación de la idolatría del Pirú* (1621) | ia:extirpaciondelai00arri | 6a9f3f7283c3b522416e21e2 | already held (2026-09-07), in OCR |
+| Kalākaua, *Legends and Myths of Hawaii* (1888) | ia:legendsmythsofha00kala | 69e729caa409200ea79f137f | already live |
+
+**Still missing: the Kumulipo itself.** The public-domain editions (Kalākaua's 1889
+Hawaiian printing, Liliʻuokalani's 1897 English) are not on Internet Archive, and the
+HathiTrust, Google Books and Library of Congress APIs all returned nothing usable from
+this machine. The 1951 Beckwith edition on IA is lending-only and in copyright. Next
+step is a residential-browser look at HathiTrust and the Bishop Museum for the 1897
+text, then the `pdf` or `google-books` import route.
+
 ## Titles
 
 ### What is working now
