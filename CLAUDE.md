@@ -10,10 +10,9 @@ recovery — 22 chapters across 4 parts, ~90k words.
 
 **Two live drafts of the same memoir, as separate books** (as of 2026-09-07):
 - `door-in-the-mountain` — **"The Door in the Mountain"**, Albert's Sept 7 2026 drop. The
-  current draft; new editorial work goes here. 21 chapters: Chapter 14 ("The Question") is
-  gone from this draft and Chapter 10 is now "El Robotico"; Chapter 1 is a prologue that
-  precedes the Part I title page in Albert's file (the importer lifts the title page into the
-  Part I opener doc, so the book map shows it as Part I's first chapter).
+  current draft; new editorial work goes here, and it is meant to be read on its own terms,
+  not against the earlier draft. Chapter 1 precedes the Part I title page in Albert's file;
+  the importer lifts that title page into the Part I opener doc.
 - `albert-lin-memoir` — the Sept 2 drop, with Derek's Ch14 work and comments in flight. Kept
   intact; don't import over it.
 Each book's git mirror lives at `manuscripts/<book-id>/`.
