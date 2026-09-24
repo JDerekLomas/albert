@@ -100,6 +100,14 @@ suggest, run AI. viewer: read, no comments (editor mounted `editable=false`, pan
   lands on the book.
 - Header account menu everywhere: name (click to change), email, sign out.
 
+## Status (end of 2026-09-25 session)
+Built, on branch `accounts`, PR #7, preview verified with a headless two-user run (see the PR
+comment). Waiting on Derek's review (auth is on the hold list). **After merge:** `vercel --prod`
+from main, re-alias the three domains (CLAUDE.md "After vercel --prod"), then
+`cd ~/sourcelibrary && secret-lover run -- node ~/albert/scripts/tighten-rls.mjs`, which drops
+the public policies and checks the anon key is blind. Then invite Albert from the Share panel
+of both memoir books, and send Pieter Jan https://albert-book.vercel.app/new.
+
 ## Rollout
 1. Branch `accounts`, PR, Vercel preview. Additive tables created before the PR.
 2. Headless-Chrome run on the preview: request link → read token hash… (tokens are hashed,
