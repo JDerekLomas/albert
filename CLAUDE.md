@@ -23,8 +23,14 @@ Each book's git mirror lives at `manuscripts/<book-id>/`.
   scoped by `book_id`) → `albert_versions` (revision history), `albert_comments`,
   `albert_chapter_summaries` + `albert_book_index` (see "Book index" below)
 - **Deployed** on Vercel: production deploys from main branch
-- Routes: `/` (all books) → `/b/[bookId]` (chapters in one book, grouped by part) → `/d/[id]`
-  (the editor)
+- Routes: `/` (the books *this browser* has created or opened — localStorage, see
+  `src/lib/my-books.ts`; there are no accounts, so this is what keeps an invited author from
+  seeing Albert's manuscript; any book is still reachable by URL) → `/b/[bookId]` (chapters in
+  one book, grouped by part) → `/d/[id]` (the editor). `/new` is the **invite link** (added
+  2026-09-25 for Pieter Jan Stappers): name, title, drop a .docx/.md/.txt or paste, preview the
+  chapter split, create. `POST /api/import` does the split (`src/lib/split-manuscript.ts`,
+  mammoth for docx) and writes nothing; the page inserts with the anon client. A visitor's name
+  is set on `/new`, by clicking their avatar in the editor, or "change" on the book page.
 
 ## Database Schema
 - `albert_books`: id, title, created_at
