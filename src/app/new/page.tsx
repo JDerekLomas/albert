@@ -11,10 +11,9 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { nanoid } from "nanoid";
-import { supabase } from "@/lib/supabase";
-import { getIdentity, hasPlaceholderName, setIdentityName } from "@/lib/presence";
-import { rememberBook } from "@/lib/my-books";
+import { auth, books as bookApi } from "@/lib/api";
+import { setIdentityFromUser } from "@/lib/presence";
+import AppHeader, { useMe } from "@/components/AppHeader";
 import type { SplitChapter } from "@/lib/split-manuscript";
 
 type Stage = "form" | "reading" | "preview" | "creating";
@@ -31,9 +30,12 @@ export default function NewBookPage() {
   const [dragging, setDragging] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const [me] = useMe();
   useEffect(() => {
-    if (!hasPlaceholderName()) setName(getIdentity().name);
-  }, []);
+    if (me === null) window.location.href = `/login?next=${encodeURIComponent("/new")}`;
+    if (me && !name) setName(me.name.includes("@") ? "" : me.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me]);
 
   const totalWords = chapters.reduce((n, c) => n + c.words, 0);
   const canRead = title.trim() && (files.length > 0 || pasted.trim());
@@ -62,31 +64,29 @@ export default function NewBookPage() {
   async function createBook() {
     setStage("creating");
     setError(null);
-    if (name.trim()) setIdentityName(name);
-    const bookId = nanoid(12);
-    const { error: bookErr } = await supabase.from("albert_books").insert({ id: bookId, title: title.trim() });
-    if (bookErr) {
-      setError(`Could not create the book: ${bookErr.message}`);
-      setStage("preview");
-      return;
+    if (name.trim()) {
+      const user = await auth.update({ name }).catch(() => null);
+      if (user) setIdentityFromUser(user);
     }
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const rows = chapters.map((c, i) => ({
-      id: c.chapter_number == null ? `${bookId}-front-${i}` : `${bookId}-ch-${pad(c.chapter_number)}`,
-      title: c.title,
-      content: c.html,
-      chapter_number: c.chapter_number,
-      part_number: null,
-      book_id: bookId,
-    }));
-    const { error: docErr } = await supabase.from("albert_documents").insert(rows);
-    if (docErr) {
-      setError(`Created the book but not its chapters: ${docErr.message}`);
+    try {
+      const book = await bookApi.create(title.trim(), chapters);
+      window.location.href = `/b/${book.id}`;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
       setStage("preview");
-      return;
     }
-    rememberBook(bookId);
-    window.location.href = `/b/${bookId}`;
+  }
+
+  async function createEmpty() {
+    if (!title.trim()) return;
+    setStage("creating");
+    try {
+      const book = await bookApi.create(title.trim());
+      window.location.href = `/b/${book.id}`;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      setStage("form");
+    }
   }
 
   function addFiles(list: FileList | File[]) {
@@ -101,6 +101,8 @@ export default function NewBookPage() {
   }
 
   return (
+    <>
+    <AppHeader crumbs={[{ label: "New book" }]} />
     <div className="max-w-2xl mx-auto px-6 py-16">
       <h1 className="text-3xl font-bold tracking-tight mb-3">Bring your book in</h1>
       <p className="text-zinc-600 leading-relaxed mb-10">
@@ -218,6 +220,9 @@ export default function NewBookPage() {
           >
             {stage === "reading" ? "Reading your manuscript…" : "Read manuscript"}
           </button>
+          <button type="button" onClick={createEmpty} disabled={!title.trim() || stage === "reading"} className="ml-4 text-sm text-zinc-500 hover:text-zinc-800 disabled:opacity-40">
+            or start with an empty book
+          </button>
         </form>
       ) : (
         <div className="space-y-6">
@@ -274,11 +279,11 @@ export default function NewBookPage() {
           </div>
 
           <p className="text-xs text-zinc-500 leading-relaxed">
-            Your book gets its own private link. There are no accounts: anyone who has the link can
-            read and edit, so share it only with the people you want working on it with you.
+            The book is private to you until you invite someone from its page.
           </p>
         </div>
       )}
     </div>
+    </>
   );
 }

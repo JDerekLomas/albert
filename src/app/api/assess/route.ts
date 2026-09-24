@@ -1,4 +1,6 @@
 import { NextRequest } from "next/server";
+import { requireDocRole } from "@/lib/server/db";
+import { errorResponse, requireUser } from "@/lib/server/session";
 import { assessChapter, paragraphs } from "@/lib/editorial.mjs";
 
 /**
@@ -15,8 +17,15 @@ import { assessChapter, paragraphs } from "@/lib/editorial.mjs";
  * see /api/continuity, which is the only pass that sees the whole book.
  */
 export async function POST(req: NextRequest) {
-  const { title, content } = await req.json();
+  const { title, content, documentId } = await req.json();
   if (!content) return Response.json({ error: "content is required" }, { status: 400 });
+  if (!documentId) return Response.json({ error: "documentId is required" }, { status: 400 });
+  try {
+    const me = await requireUser();
+    await requireDocRole(documentId, me.email, "editor");
+  } catch (e) {
+    return errorResponse(e);
+  }
 
   if (/data-suggest/.test(content)) {
     return Response.json(

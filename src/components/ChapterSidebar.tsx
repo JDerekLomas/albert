@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase, Document, Book } from "@/lib/supabase";
+import { books } from "@/lib/api";
+import { Document, Book } from "@/lib/supabase";
 
 export default function ChapterSidebar({
   bookId,
@@ -24,17 +25,10 @@ export default function ChapterSidebar({
         setLoading(false);
         return;
       }
-      const [{ data: bookRow }, { data }] = await Promise.all([
-        supabase.from("albert_books").select("*").eq("id", bookId).single(),
-        supabase
-          .from("albert_documents")
-          .select("*")
-          .eq("book_id", bookId)
-          .order("part_number", { ascending: true, nullsFirst: false })
-          .order("chapter_number", { ascending: true, nullsFirst: false }),
-      ]);
+      const detail = await books.get(bookId).catch(() => null);
       if (cancelled) return;
-      const docs = (data || []) as Document[];
+      const bookRow = detail?.book ?? null;
+      const docs = (detail?.documents || []) as Document[];
       const others = docs.filter((d) => d.chapter_number == null);
       const labels: Record<number, string> = {};
       for (const d of others) if (d.part_number != null) labels[d.part_number] = d.title;

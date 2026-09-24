@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { db, requireRole } from "@/lib/server/db";
+import { errorResponse, requireUser } from "@/lib/server/session";
 import { runContinuity } from "@/lib/editorial.mjs";
 
 /**
@@ -22,11 +23,15 @@ export const maxDuration = 300;
 export async function POST(req: NextRequest) {
   const { bookId } = await req.json();
   if (!bookId) return Response.json({ error: "bookId is required" }, { status: 400 });
+  let me;
+  try {
+    me = await requireUser();
+    await requireRole(bookId, me.email, "editor");
+  } catch (e) {
+    return errorResponse(e);
+  }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = db();
 
   const { data: docs, error } = await supabase
     .from("albert_documents")

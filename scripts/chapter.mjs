@@ -67,7 +67,7 @@ for (const f of [".env.local", ".env"]) {
 }
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 if (!URL || !KEY) {
   console.error("Missing Supabase env — expected .env.local with NEXT_PUBLIC_SUPABASE_URL + _ANON_KEY");
   process.exit(1);
