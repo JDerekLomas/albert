@@ -38,3 +38,18 @@ update albert_books set owner_email = 'derek@playpowerlabs.com' where owner_emai
 insert into albert_book_members (book_id, email, role, accepted_at)
   select id, 'derek@playpowerlabs.com', 'owner', now() from albert_books
   on conflict (book_id, email) do nothing;
+
+-- The app's key is scoped to the Postgres role albert_app (not service_role), so
+-- every new table needs an explicit grant and an allow-all policy for that role.
+grant select, insert, update, delete on albert_users, albert_login_tokens, albert_book_members to albert_app;
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename='albert_users' and policyname='albert_app_all') then
+    create policy albert_app_all on albert_users for all to albert_app using (true) with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='albert_login_tokens' and policyname='albert_app_all') then
+    create policy albert_app_all on albert_login_tokens for all to albert_app using (true) with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='albert_book_members' and policyname='albert_app_all') then
+    create policy albert_app_all on albert_book_members for all to albert_app using (true) with check (true);
+  end if;
+end $$;

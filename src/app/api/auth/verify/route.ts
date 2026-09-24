@@ -19,7 +19,9 @@ export async function POST(req: NextRequest) {
 
     const email = row.email as string;
     let { data: user } = await db().from("albert_users").select("*").eq("email", email).maybeSingle();
+    let isNew = false;
     if (!user) {
+      isNew = true;
       const created = await db()
         .from("albert_users")
         .insert({ email, name: email.split("@")[0], color: COLORS[Math.floor(Math.random() * COLORS.length)] })
@@ -33,7 +35,14 @@ export async function POST(req: NextRequest) {
     await db().from("albert_book_members").update({ accepted_at: new Date().toISOString() }).eq("email", email).is("accepted_at", null);
 
     await setSessionCookie({ uid: user.id, email, name: user.name, color: user.color });
-    return Response.json({ ok: true, redirect: row.redirect || "/", user: { uid: user.id, email, name: user.name, color: user.color } });
+    // A brand-new account has no real name yet (just the email's local part);
+    // the verify page asks for one before moving on.
+    return Response.json({
+      ok: true,
+      redirect: row.redirect || "/",
+      needsName: isNew,
+      user: { uid: user.id, email, name: user.name, color: user.color },
+    });
   } catch (e) {
     return errorResponse(e);
   }

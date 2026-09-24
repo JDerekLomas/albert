@@ -37,7 +37,7 @@ export async function api<T>(path: string, init?: { method?: string; body?: unkn
 export const auth = {
   me: () => api<{ user: User }>("/api/auth/me", { noRedirect: true }).then((r) => r.user).catch(() => null),
   request: (email: string, redirect?: string) => api<{ ok: true }>("/api/auth/request", { method: "POST", body: { email, redirect } }),
-  verify: (token: string) => api<{ ok: true; redirect: string; user: User }>("/api/auth/verify", { method: "POST", body: { token } }),
+  verify: (token: string) => api<{ ok: true; redirect: string; needsName: boolean; user: User }>("/api/auth/verify", { method: "POST", body: { token } }),
   signout: () => api<{ ok: true }>("/api/auth/signout", { method: "POST" }),
   update: (patch: { name?: string; color?: string }) => api<{ user: User }>("/api/auth/me", { method: "PATCH", body: patch }).then((r) => r.user),
 };

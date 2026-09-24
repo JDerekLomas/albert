@@ -23,17 +23,34 @@ Each book's git mirror lives at `manuscripts/<book-id>/`.
   scoped by `book_id`) → `albert_versions` (revision history), `albert_comments`,
   `albert_chapter_summaries` + `albert_book_index` (see "Book index" below)
 - **Deployed** on Vercel: production deploys from main branch
-- Routes: `/` (the books *this browser* has created or opened — localStorage, see
-  `src/lib/my-books.ts`; there are no accounts, so this is what keeps an invited author from
-  seeing Albert's manuscript; any book is still reachable by URL) → `/b/[bookId]` (chapters in
-  one book, grouped by part) → `/d/[id]` (the editor). `/new` is the **invite link** (added
-  2026-09-25 for Pieter Jan Stappers): name, title, drop a .docx/.md/.txt or paste, preview the
-  chapter split, create. `POST /api/import` does the split (`src/lib/split-manuscript.ts`,
-  mammoth for docx) and writes nothing; the page inserts with the anon client. A visitor's name
-  is set on `/new`, by clicking their avatar in the editor, or "change" on the book page.
+- **Accounts (2026-09-25, PR #7).** Email magic-link sign-in via Resend, signed httpOnly cookie
+  (`me_session`, `src/lib/server/session.ts`), users in `albert_users`. **The browser never
+  talks to Supabase for data**: everything goes through `/api/*` (`src/lib/api.ts` is the
+  client; routes use `src/lib/server/db.ts` and check membership with `requireRole` /
+  `requireDocRole`). The anon client (`src/lib/supabase.ts`) is for realtime presence only.
+  Roles per book in `albert_book_members` (owner / editor / viewer, keyed by email so invites
+  precede accounts). Design + API contract: `.claude/handoffs/2026-09-25-accounts-sharing-onboarding.md`.
+- Routes: `/` (landing when signed out; your books when signed in) → `/b/[bookId]` (book map,
+  Share panel for owners, first-visit guide card) → `/d/[id]` (the editor; read-only for
+  viewers). `/new` brings a manuscript in (`POST /api/import` splits .docx/.md/.txt, writes
+  nothing; `POST /api/books` creates). `/login`, `/auth/verify` (token consumed by a button
+  press, never on page load), `/join/[token]` (share links), `/guide`.
+- **The "service" key is not service_role.** `SUPABASE_SERVICE_ROLE_KEY` (locally and on
+  Vercel) is an `sb_secret_…` key scoped to the Postgres role **`albert_app`**, which has grants
+  and an `albert_app_all` policy on each `albert_*` table and nothing else in the shared
+  database. Any new table needs `grant … to albert_app` plus that policy or the API 500s with
+  "permission denied" (see `db/schema.sql`). DDL goes through sourcelibrary's `SUPABASE_DB_URL`
+  as described under "DDL access" below.
+- Env (Vercel, all three environments): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `SESSION_SECRET` (rotating it signs everyone
+  out), `RESEND_API_KEY` (sourcelibrary's; sender `AUTH_EMAIL_FROM`, default
+  `editor@sourcelibrary.org`), `APP_URL` (production only; previews link to their own host).
 
 ## Database Schema
-- `albert_books`: id, title, created_at
+- `albert_books`: id, title, created_at, owner_email, share_token (null = link off), share_role
+- `albert_users`: id, email, name, color, created_at, last_seen_at
+- `albert_book_members`: book_id, email, role (owner|editor|viewer), invited_by, created_at, accepted_at
+- `albert_login_tokens`: token_hash (sha256), email, redirect, expires_at, used_at
 - `albert_documents`: id, title, content (HTML), chapter_number, part_number, book_id,
   created_at, updated_at — chapters have `chapter_number`; part-opener docs (title/epigraph
   page) have `chapter_number = null` and `part_number` set; free-floating notes have both null.
@@ -246,18 +263,17 @@ fresh) — don't just trust the deploy command's "Ready" status.
 
 ## If you're a different AI session working in this repo
 Welcome — this section is for you specifically (Albert's Claude Code, a collaborator's session,
-whoever's not Derek's own). The repo is public, so you can clone and read freely. To also
-read/write chapters and post comments, you only need **`NEXT_PUBLIC_SUPABASE_URL` +
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`** in a `.env.local` — that's the same access level the web app
-itself runs on (`src/lib/supabase.ts` never uses anything else client-side), and the RLS
-policies on every `albert_*` table are permissive enough for full read/write with just that key.
+whoever's not Derek's own). The repo is public, so you can clone and read freely.
 
-**Do not use `SUPABASE_SERVICE_ROLE_KEY`, and do not ask Derek for it.** This Supabase project
-is shared with `sourcelibrary`, an unrelated production app with real users — the service role
-key bypasses RLS entirely and is a master key over *that entire database*, not just this book.
-If you're not Derek's own session working directly in this repo with `.env.local` already
-present, you don't need it and shouldn't have it.
+**There is no anonymous data access any more.** Since 2026-09-25 the browser signs in (email
+link) and every read/write goes through `/api/*` with a membership check; the anon key only
+opens realtime channels. To work on a book you need to be a member of it: ask the owner to
+invite your email from the book's Share panel, then sign in at `/login`. Scripts in `scripts/`
+need the `albert_app`-scoped key in `.env.local` (see "The service key is not service_role"
+above) — that key is scoped to this app's tables, but it still bypasses per-book membership, so
+it is for Derek's machine, not for handing out.
 
-**Edits go through `scripts/suggest-chapter.mjs`, never a direct `content` write** — see
-"Working with the Manuscript" above. This isn't optional: Derek/Albert's whole review workflow
-depends on AI edits arriving as reviewable suggestion marks, not applied prose.
+**Edits go through `scripts/suggest-chapter.mjs` or the in-app AI panel, never a direct
+`content` write** — see "Working with the Manuscript" above. This isn't optional: Derek/Albert's
+whole review workflow depends on AI edits arriving as reviewable suggestion marks, not applied
+prose.
