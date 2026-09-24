@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Editor } from "@tiptap/react";
-import { supabase, Comment } from "@/lib/supabase";
+import { documents, comments as commentApi } from "@/lib/api";
+import { Comment } from "@/lib/supabase";
 import { getIdentity } from "@/lib/presence";
 import {
   applyCommentMark,
@@ -36,12 +37,7 @@ export default function CommentsPanel({
   }, [documentId]);
 
   async function loadComments() {
-    const { data } = await supabase
-      .from("albert_comments")
-      .select("*")
-      .eq("document_id", documentId)
-      .order("created_at", { ascending: false });
-    setComments(data || []);
+    setComments(await documents.comments(documentId).catch(() => []));
   }
 
   async function addComment() {
@@ -49,44 +45,33 @@ export default function CommentsPanel({
 
     const hasAnchor = selectedText && selectionRange.from !== selectionRange.to;
 
-    const { data, error } = await supabase
-      .from("albert_comments")
-      .insert({
-        document_id: documentId,
+    try {
+      const data = await documents.addComment(documentId, {
         content: newComment.trim(),
-        author: identity.name,
         from_pos: hasAnchor ? selectionRange.from : 0,
         to_pos: hasAnchor ? selectionRange.to : 0,
         quote: selectedText || null,
-        resolved: false,
-      })
-      .select()
-      .single();
-
-    if (!error && data) {
+      });
       setPostError(null);
       setNewComment("");
       if (editor && hasAnchor) {
         applyCommentMark(editor, selectionRange.from, selectionRange.to, data.id);
       }
       loadComments();
-    } else {
-      setPostError(error?.message ?? "Failed to post comment");
+    } catch (e) {
+      setPostError(e instanceof Error ? e.message : "Failed to post comment");
     }
   }
 
   async function toggleResolved(comment: Comment) {
     const resolved = !comment.resolved;
-    await supabase
-      .from("albert_comments")
-      .update({ resolved })
-      .eq("id", comment.id);
+    await commentApi.setResolved(comment.id, resolved);
     if (editor) setCommentMarkResolved(editor, comment.id, resolved);
     loadComments();
   }
 
   async function deleteComment(id: string) {
-    await supabase.from("albert_comments").delete().eq("id", id);
+    await commentApi.remove(id);
     if (editor) removeCommentMark(editor, id);
     loadComments();
   }

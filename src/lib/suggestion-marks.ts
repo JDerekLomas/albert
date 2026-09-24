@@ -1,5 +1,5 @@
 import { Mark, mergeAttributes } from "@tiptap/core";
-import { supabase } from "./supabase";
+import { documents } from "./api";
 
 /**
  * Suggestion marks — the review layer. An AI (or human) proposes an edit as
@@ -170,16 +170,18 @@ async function logResolution(
 ) {
   const del = suggestionText(suggestion, "del");
   const ins = suggestionText(suggestion, "ins");
-  const { error } = await supabase.from("albert_suggestion_log").insert({
-    document_id: documentId,
-    sid: suggestion.sid,
-    action: accept ? "accepted" : "rejected",
-    del_text: del,
-    ins_text: ins,
-    reason: suggestion.reason,
-    author: suggestion.author,
-  });
-  if (error) console.error("Failed to log suggestion resolution:", error.message);
+  try {
+    await documents.logSuggestion(documentId, {
+      sid: suggestion.sid,
+      action: accept ? "accepted" : "rejected",
+      del_text: del,
+      ins_text: ins,
+      reason: suggestion.reason,
+      author: suggestion.author,
+    });
+  } catch (e) {
+    console.error("Failed to log suggestion resolution:", e instanceof Error ? e.message : e);
+  }
 }
 
 /**

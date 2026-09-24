@@ -7,7 +7,8 @@ import Typography from "@tiptap/extension-typography";
 import { useEffect, useRef, useCallback, useState } from "react";
 import NextLink from "next/link";
 import { nanoid } from "nanoid";
-import { supabase, Document } from "@/lib/supabase";
+import { Document } from "@/lib/supabase";
+import { auth, documents as docApi, Role } from "@/lib/api";
 import { createChannel, subscribeChannel, getIdentity, setIdentityName, Peer } from "@/lib/presence";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import Toolbar from "./Toolbar";
@@ -27,7 +28,8 @@ import {
   type Passage,
 } from "@/lib/passage-heat";
 
-export default function Editor({ document: doc }: { document: Document }) {
+export default function Editor({ document: doc, role = "editor" }: { document: Document; role?: Role }) {
+  const readOnly = role === "viewer";
   const [title, setTitle] = useState(doc.title);
   const [peers, setPeers] = useState<Peer[]>([]);
   const [saving, setSaving] = useState(false);
@@ -62,15 +64,17 @@ export default function Editor({ document: doc }: { document: Document }) {
 
   // Your name travels with presence and comments. A visitor starts as a random
   // "Swift Fox"; clicking the avatar is how they become themselves.
-  function renameMe() {
+  async function renameMe() {
     const next = prompt("Your name, as collaborators will see it:", myName);
     if (!next || !next.trim()) return;
-    const updated = setIdentityName(next);
+    const user = await auth.update({ name: next }).catch(() => null);
+    const updated = setIdentityName(user?.name || next);
     setMyName(updated.name);
     channelRef.current?.track({ name: updated.name, color: updated.color, online_at: new Date().toISOString() });
   }
 
   const editor = useEditor({
+    editable: !readOnly,
     immediatelyRender: false,
     extensions: [
       StarterKit,
@@ -137,16 +141,18 @@ export default function Editor({ document: doc }: { document: Document }) {
     (content: string) => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(async () => {
+        if (readOnly) return;
         setSaving(true);
-        await supabase
-          .from("albert_documents")
-          .update({ content, updated_at: new Date().toISOString() })
-          .eq("id", doc.id);
+        try {
+          await docApi.save(doc.id, { content });
+          setLastSaved(new Date());
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : "Save failed");
+        }
         setSaving(false);
-        setLastSaved(new Date());
       }, 500);
     },
-    [doc.id]
+    [doc.id, readOnly]
   );
 
   const runAssessment = useCallback(async () => {
@@ -157,7 +163,7 @@ export default function Editor({ document: doc }: { document: Document }) {
       const res = await fetch("/api/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: doc.title, content: editor.getHTML() }),
+        body: JSON.stringify({ documentId: doc.id, title: doc.title, content: editor.getHTML() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
@@ -192,10 +198,8 @@ export default function Editor({ document: doc }: { document: Document }) {
 
   const saveTitle = useCallback(
     async (newTitle: string) => {
-      await supabase
-        .from("albert_documents")
-        .update({ title: newTitle, updated_at: new Date().toISOString() })
-        .eq("id", doc.id);
+      if (readOnly) return;
+      await docApi.save(doc.id, { title: newTitle }).catch(() => undefined);
 
       if (channelRef.current) {
         channelRef.current.send({
@@ -329,19 +333,18 @@ export default function Editor({ document: doc }: { document: Document }) {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
         if (editor) {
+          if (readOnly) return;
           setSaving(true);
-          supabase
-            .from("albert_documents")
-            .update({
-              content: editor.getHTML(),
-              title,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", doc.id)
+          docApi
+            .save(doc.id, { content: editor.getHTML(), title })
             .then(() => {
               setSaving(false);
               setLastSaved(new Date());
               showToast("Saved");
+            })
+            .catch((e) => {
+              setSaving(false);
+              showToast(e instanceof Error ? e.message : "Save failed");
             });
         }
       }
@@ -457,13 +460,12 @@ export default function Editor({ document: doc }: { document: Document }) {
                 if (!editor) return;
                 const msg = prompt("Version label (optional):");
                 if (msg === null) return;
-                await supabase.from("albert_versions").insert({
-                  document_id: doc.id,
-                  content: editor.getHTML(),
-                  title,
-                  message: msg || `Snapshot ${new Date().toLocaleDateString()}`,
-                });
-                showToast("Version saved");
+                try {
+                  await docApi.saveVersion(doc.id, { content: editor.getHTML(), title, message: msg || `Snapshot ${new Date().toLocaleDateString()}` });
+                  showToast("Version saved");
+                } catch (e) {
+                  showToast(e instanceof Error ? e.message : "Could not save version");
+                }
               }}
               className="text-[11px] text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 px-2 py-0.5 rounded transition-colors"
               title="Save a named version"
@@ -786,6 +788,7 @@ export default function Editor({ document: doc }: { document: Document }) {
             </button>
           </div>
           <AIPanel
+            documentId={doc.id}
             documentContent={editor?.getText() || ""}
             selectedText={selectedText}
             onInsert={handleInsert}

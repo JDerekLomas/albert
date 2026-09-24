@@ -91,6 +91,21 @@ export function setIdentityName(name: string): Peer {
   return identity;
 }
 
+/** Adopt the signed-in account as this browser's identity: the id is the
+ *  account id, so the same person on two devices is one presence. */
+export function setIdentityFromUser(user: { uid: string; name: string; color: string }): Peer {
+  const identity: Peer = { id: user.uid, name: user.name || "Someone", color: user.color || randomColor() };
+  storedIdentity = identity;
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("albert-identity", JSON.stringify(identity));
+    } catch {
+      /* ignore */
+    }
+  }
+  return identity;
+}
+
 /** True while the name is still one of the random "Swift Fox" placeholders. */
 export function hasPlaceholderName(): boolean {
   const { name } = getIdentity();

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { supabase, Document } from "@/lib/supabase";
+import { books } from "@/lib/api";
+import {Document } from "@/lib/supabase";
 import {
   chapterStats,
   median,
@@ -91,19 +92,13 @@ export default function BookMap({
   }, [bookId, chapters.length]);
 
   async function load() {
-    const [{ data: v }, { data: c }] = await Promise.all([
-      supabase.from("albert_chapter_verdicts").select("*").eq("book_id", bookId),
-      supabase
-        .from("albert_comments")
-        .select("document_id")
-        .eq("resolved", false)
-        .in("document_id", chapters.map((d) => d.id)),
-    ]);
-    setVerdicts(Object.fromEntries((v || []).map((r: Verdict) => [r.document_id, r])));
-    const counts: Record<string, number> = {};
-    for (const row of (c || []) as { document_id: string }[])
-      counts[row.document_id] = (counts[row.document_id] || 0) + 1;
-    setComments(counts);
+    try {
+      const { verdicts: v, openComments } = await books.verdicts(bookId);
+      setVerdicts(Object.fromEntries((v as unknown as Verdict[]).map((r) => [r.document_id, r])));
+      setComments(openComments);
+    } catch (e) {
+      console.error("book map:", e instanceof Error ? e.message : e);
+    }
   }
 
   async function assessAll() {

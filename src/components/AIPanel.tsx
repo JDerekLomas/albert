@@ -9,11 +9,13 @@ type Message = {
 };
 
 export default function AIPanel({
+  documentId,
   documentContent,
   selectedText,
   onInsert,
   onReplace,
 }: {
+  documentId: string;
   documentContent: string;
   selectedText: string;
   onInsert: (text: string) => void;
@@ -52,6 +54,7 @@ export default function AIPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          documentId,
           prompt: userMessage,
           context:
             mode === "edit" && selectedText

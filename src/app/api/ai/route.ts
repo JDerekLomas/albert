@@ -1,12 +1,21 @@
 import { NextRequest } from "next/server";
+import { requireDocRole } from "@/lib/server/db";
+import { errorResponse, requireUser } from "@/lib/server/session";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 
 export async function POST(req: NextRequest) {
-  const { prompt, context, mode } = await req.json();
+  const { prompt, context, mode, documentId } = await req.json();
 
   if (!prompt) {
     return Response.json({ error: "prompt is required" }, { status: 400 });
+  }
+  if (!documentId) return Response.json({ error: "documentId is required" }, { status: 400 });
+  try {
+    const me = await requireUser();
+    await requireDocRole(documentId, me.email, "editor");
+  } catch (e) {
+    return errorResponse(e);
   }
 
   const systemPrompts: Record<string, string> = {

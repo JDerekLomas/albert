@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase, Version, Document } from "@/lib/supabase";
+import { documents } from "@/lib/api";
+import { Version, Document } from "@/lib/supabase";
 import { diff_match_patch, Diff } from "diff-match-patch";
 import Link from "next/link";
 
@@ -18,12 +19,8 @@ export default function HistoryPage() {
   useEffect(() => {
     async function load() {
       const [docRes, versionsRes] = await Promise.all([
-        supabase.from("albert_documents").select("*").eq("id", id).single(),
-        supabase
-          .from("albert_versions")
-          .select("*")
-          .eq("document_id", id)
-          .order("created_at", { ascending: false }),
+        documents.get(id).then((r) => ({ data: r.document })).catch(() => ({ data: null })),
+        documents.versions(id).then((v) => ({ data: v })).catch(() => ({ data: [] as Version[] })),
       ]);
 
       if (docRes.data) setDoc(docRes.data);
@@ -86,21 +83,10 @@ export default function HistoryPage() {
     if (!confirm(`Restore to "${version.message || "this version"}"?`)) return;
 
     if (doc) {
-      await supabase.from("albert_versions").insert({
-        document_id: id,
-        content: doc.content,
-        title: doc.title,
-        message: "Before restore",
-      });
+      await documents.saveVersion(id, { content: doc.content, title: doc.title, message: "Before restore" });
     }
 
-    await supabase
-      .from("albert_documents")
-      .update({
-        content: version.content,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
+    await documents.save(id, { content: version.content });
 
     window.location.href = `/d/${id}`;
   }
