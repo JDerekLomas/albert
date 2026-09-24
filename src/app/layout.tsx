@@ -14,8 +14,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Albert - Collaborative Markdown",
-  description: "Edit markdown together in real time",
+  title: "Manuscript Editor",
+  description: "Work on a book together: suggestions, comments, versions, and a map of the whole manuscript.",
 };
 
 export default function RootLayout({

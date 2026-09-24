@@ -171,7 +171,7 @@ export default function BookMap({
       .sort((a, b) => a[0] - b[0])
       .map(([num, cs]) => ({
         num,
-        label: partLabels[num] || (num ? `Part ${num}` : "Unsorted"),
+        label: partLabels[num] || (num ? `Part ${num}` : "Chapters"),
         chapters: cs,
         words: cs.reduce((s, c) => s + c.words, 0),
       }));

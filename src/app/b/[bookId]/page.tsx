@@ -7,6 +7,8 @@ import { nanoid } from "nanoid";
 import Link from "next/link";
 import ContinuityPanel from "@/components/ContinuityPanel";
 import BookMap from "@/components/BookMap";
+import { rememberBook } from "@/lib/my-books";
+import { getIdentity, hasPlaceholderName, setIdentityName } from "@/lib/presence";
 
 export default function BookPage() {
   const params = useParams();
@@ -16,6 +18,17 @@ export default function BookPage() {
   const [chapters, setChapters] = useState<Document[]>([]);
   const [other, setOther] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [myName, setMyName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMyName(hasPlaceholderName() ? "" : getIdentity().name);
+  }, []);
+
+  function renameMe() {
+    const next = prompt("Your name, as collaborators will see it:", myName || "");
+    if (!next || !next.trim()) return;
+    setMyName(setIdentityName(next).name);
+  }
 
   useEffect(() => {
     loadBook();
@@ -34,6 +47,7 @@ export default function BookPage() {
     ]);
 
     setBook(bookRow || null);
+    if (bookRow) rememberBook(bookId);
     const all = (docs || []) as Document[];
     setChapters(all.filter((d) => d.chapter_number != null));
     setOther(all.filter((d) => d.chapter_number == null));
@@ -102,6 +116,18 @@ export default function BookPage() {
           Writing Projects
         </Link>
         <span>/</span>
+        <span className="ml-auto">
+          {myName === null ? null : myName ? (
+            <>
+              You are <span className="text-zinc-600">{myName}</span> &middot;{" "}
+              <button onClick={renameMe} className="underline hover:text-zinc-600">change</button>
+            </>
+          ) : (
+            <button onClick={renameMe} className="underline text-amber-700 hover:text-amber-900">
+              Set your name so collaborators know who edited
+            </button>
+          )}
+        </span>
       </div>
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold tracking-tight">{book.title}</h1>

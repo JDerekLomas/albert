@@ -8,7 +8,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import NextLink from "next/link";
 import { nanoid } from "nanoid";
 import { supabase, Document } from "@/lib/supabase";
-import { createChannel, subscribeChannel, getIdentity, Peer } from "@/lib/presence";
+import { createChannel, subscribeChannel, getIdentity, setIdentityName, Peer } from "@/lib/presence";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import Toolbar from "./Toolbar";
 import AIPanel from "./AIPanel";
@@ -58,6 +58,17 @@ export default function Editor({ document: doc }: { document: Document }) {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRemoteUpdate = useRef(false);
   const identity = getIdentity();
+  const [myName, setMyName] = useState(identity.name);
+
+  // Your name travels with presence and comments. A visitor starts as a random
+  // "Swift Fox"; clicking the avatar is how they become themselves.
+  function renameMe() {
+    const next = prompt("Your name, as collaborators will see it:", myName);
+    if (!next || !next.trim()) return;
+    const updated = setIdentityName(next);
+    setMyName(updated.name);
+    channelRef.current?.track({ name: updated.name, color: updated.color, online_at: new Date().toISOString() });
+  }
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -417,13 +428,15 @@ export default function Editor({ document: doc }: { document: Document }) {
                   {peer.name[0]}
                 </div>
               ))}
-              <div
-                title={`${identity.name} (you)`}
-                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-semibold ring-2 ring-white"
+              <button
+                type="button"
+                onClick={renameMe}
+                title={`${myName} (you) — click to change your name`}
+                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-semibold ring-2 ring-white cursor-pointer"
                 style={{ backgroundColor: identity.color }}
               >
-                {identity.name[0]}
-              </div>
+                {myName[0]}
+              </button>
             </div>
 
             {/* Save status */}

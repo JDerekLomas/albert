@@ -21,6 +21,7 @@
     "@types/turndown": "^5.0.6",
     "diff-match-patch": "^1.0.5",
     "lowlight": "^3.3.0",
+    "mammoth": "^1.12.3",
     "marked": "^18.0.0",
     "nanoid": "^5.1.7",
     "next": "16.2.3",

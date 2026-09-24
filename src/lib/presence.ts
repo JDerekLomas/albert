@@ -16,8 +16,7 @@ function randomColor() {
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
-function randomName() {
-  const adjectives = [
+const ADJECTIVES = [
     "Swift",
     "Bright",
     "Calm",
@@ -26,8 +25,8 @@ function randomName() {
     "Warm",
     "Quick",
     "Keen",
-  ];
-  const nouns = [
+];
+const NOUNS = [
     "Fox",
     "Owl",
     "Bear",
@@ -36,8 +35,10 @@ function randomName() {
     "Wolf",
     "Lynx",
     "Crow",
-  ];
-  return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
+];
+
+function randomName() {
+  return `${ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]} ${NOUNS[Math.floor(Math.random() * NOUNS.length)]}`;
 }
 
 export type Peer = {
@@ -71,6 +72,30 @@ export function getIdentity(): Peer {
 
   storedIdentity = identity;
   return identity;
+}
+
+/** Give this browser's identity a real name. Presence and comments use it;
+ *  peers already in the room see the new name on the next presence sync. */
+export function setIdentityName(name: string): Peer {
+  const identity = getIdentity();
+  const trimmed = name.trim().slice(0, 60);
+  if (!trimmed) return identity;
+  identity.name = trimmed;
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("albert-identity", JSON.stringify(identity));
+    } catch {
+      /* ignore */
+    }
+  }
+  return identity;
+}
+
+/** True while the name is still one of the random "Swift Fox" placeholders. */
+export function hasPlaceholderName(): boolean {
+  const { name } = getIdentity();
+  const [a, b, ...rest] = name.split(" ");
+  return rest.length === 0 && ADJECTIVES.includes(a) && NOUNS.includes(b);
 }
 
 export function createChannel(documentId: string): RealtimeChannel {
